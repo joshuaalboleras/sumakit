@@ -1,59 +1,121 @@
-<?php 
+<?php
 include './configuration/config.php';
 include './configuration/routes.php';
+if (isset($_SESSION['message'])) {
+    unset($_SESSION['message']);
+}
+
+if (isset($_SESSION['errors'])) {
+    foreach ($_SESSION['errors'] as $key => $value) {
+        $$key = $_SESSION['errors'][$key][0];
+    }
+}
 ?>
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html class="no-js" lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        .standard-form{
-            border: 1px solid black;
-            padding:10px;
-        }
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Adomx - Responsive Bootstrap 4 Admin Template</title>
+    <meta name="robots" content="noindex, follow" />
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="assets/images/favicon.ico">
 
-        .standard-form div{
-            border: 1px solid black;
-            padding: 10px;
-            display: inline-block;
-        }
+    <!-- CSS
+	============================================ -->
 
-        .standard-form div label{
-            display: block;
-            
-        }
-    </style>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="assets/css/vendor/bootstrap.min.css">
+
+    <!-- Icon Font CSS -->
+    <link rel="stylesheet" href="assets/css/vendor/material-design-iconic-font.min.css">
+    <link rel="stylesheet" href="assets/css/vendor/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/vendor/themify-icons.css">
+    <link rel="stylesheet" href="assets/css/vendor/cryptocurrency-icons.css">
+
+    <!-- Plugins CSS -->
+    <link rel="stylesheet" href="assets/css/plugins/plugins.css">
+
+    <!-- Helper CSS -->
+    <link rel="stylesheet" href="assets/css/helper.css">
+
+    <!-- Main Style CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- Custom Style CSS Only For Demo Purpose -->
+    <link id="cus-style" rel="stylesheet" href="assets/css/style-primary.css">
+
 </head>
-<body>
-    <form action="./handler/auth/login.php" method="post" class="standard-form">
-        <div>
-            <?php 
-                
-                if(isset($_SESSION['message'])){
-                    echo "<h1>{$_SESSION['message']}</h1>";
-                    unset($_SESSION['message']);
-                }
 
-                if(isset($_SESSION['errors'])){
-                    foreach($_SESSION['errors'] as $key => $value){
-                       $$key = $_SESSION['errors'][$key][0];
-                    }
-                }                  
-            ?>
-        </div>
-        <div>
-            <label for="email">Email</label>
-            <input type="text" id="email" name="email" placeholder="<?= $email ?? 'Enter enail' ?>" autocomplete="off">
-        </div>
-        <div>
-            <label for="password">Password</label>
-            <input type="text" id="password" name="password" placeholder="<?= $password ?? "Enter Password" ?> " autocomplete="off">
-        </div>
-        <button>submit</button>
-    </form>
+<body class="skin-dark">
+
+    <div class="main-wrapper">
+
+        <!-- Content Body Start -->
+        <div class="content-body m-0 p-0">
+
+            <div class="login-register-wrap">
+                <div class="row">
+
+                    <div class="d-flex align-self-center justify-content-center order-2 order-lg-1 col-lg-5 col-12">
+                        <div class="login-register-form-wrap">
+                            <div class="content">
+                                <h1>Sign in</h1>
+                                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                            </div>
+
+                            <div class="login-register-form">
+                                <form action="./handler/auth/login.php" method="post">
+                                    <div class="row">
+                                        <div class="col-12 mb-20"><input class="form-control <?php onerror('email','danger','')?>" type="text"name="email" placeholder="<?= $email ?? 'Enter email' ?>"></div>
+                                        <div class="col-12 mb-20"><input class="form-control <?php onerror('password','danger','') ?>" type="password" name="password" placeholder="<?= $password ?? "Enter Password" ?> "></div>
+                                        <div class="col-12 mb-20"><label for="remember" class="adomx-checkbox-2"><input id="remember" type="checkbox"><i class="icon"></i>Remember.</label></div>
+                                        <div class="col-12">
+                                            <div class="row justify-content-between">
+                                                <div class="col-auto mb-15"><a href="#">Forgot Password?</a></div>
+                                                <div class="col-auto mb-15">Dont have account? <a href="register.html">Create Now.</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mt-10"><button class="button button-primary button-outline">sign in</button></div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="login-register-bg order-1 order-lg-2 col-lg-7 col-12">
+                        <div class="content">
+                            <h1>Sign in</h1>
+                            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div><!-- Content Body End -->
+
+    </div>
+
+    <!-- JS
+============================================ -->
+
+    <!-- Global Vendor, plugins & Activation JS -->
+    <script src="assets/js/vendor/modernizr-3.6.0.min.js"></script>
+    <script src="assets/js/vendor/jquery-3.3.1.min.js"></script>
+    <script src="assets/js/vendor/popper.min.js"></script>
+    <script src="assets/js/vendor/bootstrap.min.js"></script>
+    <!--Plugins JS-->
+    <script src="assets/js/plugins/perfect-scrollbar.min.js"></script>
+    <script src="assets/js/plugins/tippy4.min.js.js"></script>
+    <!--Main JS-->
+    <script src="assets/js/main.js"></script>
+
 </body>
+
 </html>
 <?php 
 unset($_SESSION['errors']);

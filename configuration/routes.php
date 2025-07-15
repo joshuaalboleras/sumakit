@@ -7,11 +7,14 @@ $redirect = strtolower($_SESSION['user']['redirect_to'] ?? '../index.php');
 
 $superadmin = [
     'superadmin/index.php',
-    'superadmin/registration.php'
+    'superadmin/registration.php',
+    'superadmin/main.php',
+
 ];
 
 $municipal_official = [
     'municipalofficial/index.php',
+    'municipalofficial/registration.php',
 ];
 
 $barangay_official = [
@@ -21,7 +24,8 @@ $barangay_official = [
 
 $visitor = [
     '/index.php',
-    'logout.php'
+    'logout.php',
+    'login.php'
 ];
 
 if($role_name == 'super admin'){
