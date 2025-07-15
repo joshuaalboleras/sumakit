@@ -8,7 +8,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
 
     if(!hash_equals($csrf_token,$_SESSION['csrf_token'])){
-        header('location:../../superadmin/register.php');
+        header('location:../../superadmin/registration.php');
         exit;
     };
 
@@ -16,5 +16,5 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $stmt->execute([
         ':province_name' => $province_name
     ]);
-    header('location:../../superadmin/register.php');
+    header('location:../../superadmin/registration.php');
 }

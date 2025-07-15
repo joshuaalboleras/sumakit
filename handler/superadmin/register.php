@@ -8,9 +8,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
 
     if(!hash_equals($csrf_token,$_SESSION['csrf_token'])){
-        header('location:../../superadmin/register.php');
+        header('location:../../superadmin/registration.php');
         exit;
     };
+    
+    if(!filter_input(INPUT_POST,'role_id',FILTER_VALIDATE_INT)){
+        $_SESSION['errors']['role'][] = "Not Valid";
+        header('location:../../superadmin/registration.php');
+        exit;    
+    }
 
     $stmt = $conn->prepare("INSERT INTO users(role_id,name,email,password) VALUES(:role_id,:name,:email,:password)");
     $stmt->execute([

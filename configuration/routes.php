@@ -7,7 +7,7 @@ $redirect = strtolower($_SESSION['user']['redirect_to'] ?? '../index.php');
 
 $superadmin = [
     'superadmin/index.php',
-    'superadmin/register.php'
+    'superadmin/registration.php'
 ];
 
 $municipal_official = [
