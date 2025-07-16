@@ -242,7 +242,7 @@ include '../configuration/routes.php';
               <div id="map_barangay" style="width:100%; height:400px; border:1px solid #ccc; border-radius:8px;"></div>
               <div class="text-muted" style="font-size: 0.95em;">Use the polygon tool to draw the boundary of the barangay. Only one polygon is allowed.</div>
             </div>
-        </div>
+          </div>
 
         </div><!-- Content Body End -->
         <!-- Footer Section Start -->
