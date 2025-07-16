@@ -764,7 +764,14 @@ $houses = $conn->query("SELECT * FROM houses")->fetchAll(PDO::FETCH_ASSOC);
                 } catch (e) {}
                 if (coords) {
                     const marker = L.marker(coords).addTo(houseMap)
-                        .bindPopup(`<strong>House #${house.house_number}</strong><br>Street: ${house.street_name}`);
+                        .bindPopup(`
+                            <strong>House #${house.house_number}</strong><br>
+                            <b>Street:</b> ${house.street_name}<br>
+                            <b>Building Type:</b> ${house.building_type}<br>
+                            <b>Status:</b> ${house.status}<br>
+                            <b>Floors:</b> ${house.no_floors}<br>
+                            <b>Year Built:</b> ${house.year_built}
+                        `);
                     houseMarkers.push(marker);
                     markerGroup.push(marker);
                 }
@@ -786,43 +793,67 @@ $houses = $conn->query("SELECT * FROM houses")->fetchAll(PDO::FETCH_ASSOC);
         }
 
         // Filter dropdown logic
-        document.getElementById('houseProvinceFilter').addEventListener('change', function() {
+        const houseProvinceSel = document.getElementById('houseProvinceFilter');
+        const houseMunicipalitySel = document.getElementById('houseMunicipalityFilter');
+        const houseBarangaySel = document.getElementById('houseBarangayFilter');
+
+        // On page load, disable municipality and barangay selects
+        houseMunicipalitySel.disabled = true;
+        houseBarangaySel.disabled = true;
+
+        houseProvinceSel.addEventListener('change', function() {
             const provinceId = this.value;
+            console.log('Province changed:', provinceId);
             // Update municipalities
-            const munSel = document.getElementById('houseMunicipalityFilter');
-            munSel.innerHTML = '<option value="">All Municipalities</option>';
-            allMunicipalities.filter(m => !provinceId || m.province_id == provinceId).forEach(m => {
-                const opt = document.createElement('option');
-                opt.value = m.id;
-                opt.textContent = m.municipality;
-                munSel.appendChild(opt);
-            });
-            // Update barangays
-            const brgySel = document.getElementById('houseBarangayFilter');
-            brgySel.innerHTML = '<option value="">All Barangays</option>';
-            allBarangays.filter(b => !provinceId || b.province_id == provinceId).forEach(b => {
-                const opt = document.createElement('option');
-                opt.value = b.id;
-                opt.textContent = b.barangay_name;
-                brgySel.appendChild(opt);
-            });
+            houseMunicipalitySel.innerHTML = '<option value="">All Municipalities</option>';
+            houseMunicipalitySel.disabled = true;
+            houseBarangaySel.innerHTML = '<option value="">All Barangays</option>';
+            houseBarangaySel.disabled = true;
+            if (provinceId) {
+                // Use AJAX to fetch municipalities
+                fetch(`/handler/barangayofficial/get_municipalities.php?province_id=${provinceId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('AJAX municipalities:', data);
+                        if (Array.isArray(data) && data.length > 0) {
+                            data.forEach(m => {
+                                const opt = document.createElement('option');
+                                opt.value = m.id;
+                                opt.textContent = m.municipality;
+                                houseMunicipalitySel.appendChild(opt);
+                            });
+                            houseMunicipalitySel.disabled = false;
+                            console.log('Municipality select enabled');
+                        } else {
+                            console.log('No municipalities found for province', provinceId);
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error fetching municipalities:', err);
+                    });
+            }
             updateHouseMap();
         });
-        document.getElementById('houseMunicipalityFilter').addEventListener('change', function() {
+        houseMunicipalitySel.addEventListener('change', function() {
             const municipalityId = this.value;
-            const provinceId = document.getElementById('houseProvinceFilter').value;
-            // Update barangays
-            const brgySel = document.getElementById('houseBarangayFilter');
-            brgySel.innerHTML = '<option value="">All Barangays</option>';
-            allBarangays.filter(b => (!provinceId || b.province_id == provinceId) && (!municipalityId || b.municipal_id == municipalityId)).forEach(b => {
-                const opt = document.createElement('option');
-                opt.value = b.id;
-                opt.textContent = b.barangay_name;
-                brgySel.appendChild(opt);
-            });
+            const provinceId = houseProvinceSel.value;
+            houseBarangaySel.innerHTML = '<option value="">All Barangays</option>';
+            houseBarangaySel.disabled = true;
+            if (municipalityId) {
+                const filteredBarangays = allBarangays.filter(b => (!provinceId || b.province_id == provinceId) && b.municipal_id == municipalityId);
+                if (filteredBarangays.length > 0) {
+                    filteredBarangays.forEach(b => {
+                        const opt = document.createElement('option');
+                        opt.value = b.id;
+                        opt.textContent = b.barangay_name;
+                        houseBarangaySel.appendChild(opt);
+                    });
+                    houseBarangaySel.disabled = false;
+                }
+            }
             updateHouseMap();
         });
-        document.getElementById('houseBarangayFilter').addEventListener('change', function() {
+        houseBarangaySel.addEventListener('change', function() {
             updateHouseMap();
         });
         document.getElementById('houseSearch').addEventListener('input', function() {

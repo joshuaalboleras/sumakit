@@ -111,6 +111,27 @@ $provinces = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <input type="text" class="form-control" id="street_name" name="street_name" maxlength="250" required>
                                     </div>
                                     <div class="form-group">
+                                        <label for="building_type">Building Type</label>
+                                        <input type="text" class="form-control" id="building_type" name="building_type" maxlength="250">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="status">Status</label>
+                                        <select class="form-control" id="status" name="status">
+                                            <option value="">Select Status</option>
+                                            <option value="occupied">Occupied</option>
+                                            <option value="vacant">Vacant</option>
+                                            <option value="under construction">Under Construction</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="no_floors">Number of Floors</label>
+                                        <input type="number" class="form-control" id="no_floors" name="no_floors" min="1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="year_built">Year Built</label>
+                                        <input type="date" class="form-control" id="year_built" name="year_built">
+                                    </div>
+                                    <div class="form-group">
                                         <label for="province_id">Province</label>
                                         <select class="form-control" id="province_id" name="province_id" required>
                                             <option value="">Select Province</option>

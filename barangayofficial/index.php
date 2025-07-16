@@ -250,7 +250,14 @@ $houses = $conn->query("SELECT * FROM houses")->fetchAll(PDO::FETCH_ASSOC);
                         } catch (e) {}
                         if (coords) {
                             const marker = L.marker(coords).addTo(map)
-                                .bindPopup(`<strong>House #${house.house_number}</strong><br>Street: ${house.street_name}`);
+                                .bindPopup(`
+                                    <strong>House #${house.house_number}</strong><br>
+                                    <b>Street:</b> ${house.street_name}<br>
+                                    <b>Building Type:</b> ${house.building_type}<br>
+                                    <b>Status:</b> ${house.status}<br>
+                                    <b>Floors:</b> ${house.no_floors}<br>
+                                    <b>Year Built:</b> ${house.year_built}
+                                `);
                             houseMarkers.push(marker);
                             markerGroup.push(marker);
                         }
