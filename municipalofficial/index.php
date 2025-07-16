@@ -1,6 +1,18 @@
 <?php
 include '../configuration/config.php';
 include '../configuration/routes.php';
+// Fetch all barangays with their province and municipality names
+$barangays = $conn->query("
+    SELECT b.*, p.province_name, m.municipality
+    FROM barangays b
+    JOIN provinces p ON b.province_id = p.id
+    JOIN municipalities m ON b.municipal_id = m.id
+")->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch all provinces for filter dropdown
+$provinces = $conn->query("SELECT * FROM provinces")->fetchAll(PDO::FETCH_ASSOC);
+// Fetch all municipalities for filter dropdown
+$municipalities = $conn->query("SELECT * FROM municipalities")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!doctype html>
 <html class="no-js" lang="en">
@@ -40,7 +52,6 @@ include '../configuration/routes.php';
     <link id="cus-style" rel="stylesheet" href="../assets/css/style-primary.css">
     <!-- Leaflet CSS for Map Viewer -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
 </head>
 
 <body class="skin-dark">
@@ -62,240 +73,8 @@ include '../configuration/routes.php';
                     </div><!-- Header Logo (Header Left) End -->
 
                     <!-- Header Right Start -->
-                    <div class="header-right flex-grow-1 col-auto">
-                        <div class="row justify-content-between align-items-center">
-
-                            <!-- Side Header Toggle & Search Start -->
-                            <div class="col-auto">
-                                <div class="row align-items-center">
-
-                                    <!--Side Header Toggle-->
-                                    <div class="col-auto"><button class="side-header-toggle"><i class="zmdi zmdi-menu"></i></button></div>
-
-                                    <!--Header Search-->
-                                    <div class="col-auto">
-
-                                        <div class="header-search">
-
-                                            <button class="header-search-open d-block d-xl-none"><i class="zmdi zmdi-search"></i></button>
-
-                                            <div class="header-search-form">
-                                                <form action="#">
-                                                    <input type="text" placeholder="Search Here">
-                                                    <button><i class="zmdi zmdi-search"></i></button>
-                                                </form>
-                                                <button class="header-search-close d-block d-xl-none"><i class="zmdi zmdi-close"></i></button>
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div><!-- Side Header Toggle & Search End -->
-
-                            <!-- Header Notifications Area Start -->
-                            <div class="col-auto">
-
-                                <ul class="header-notification-area">
-
-                                    <!--Language-->
-                                    <li class="adomx-dropdown position-relative col-auto">
-                                        <a class="toggle" href="#"><img class="lang-flag" src="../assets/images/flags/flag-1.jpg" alt=""><i class="zmdi zmdi-caret-down drop-arrow"></i></a>
-
-                                        <!-- Dropdown -->
-                                        <ul class="adomx-dropdown-menu dropdown-menu-language">
-                                            <li><a href="#"><img src="../assets/images/flags/flag-1.jpg" alt=""> English</a></li>
-                                            <li><a href="#"><img src="../assets/images/flags/flag-2.jpg" alt=""> Japanese</a></li>
-                                            <li><a href="#"><img src="../assets/images/flags/flag-3.jpg" alt=""> Spanish </a></li>
-                                            <li><a href="#"><img src="../assets/images/flags/flag-4.jpg" alt=""> Germany</a></li>
-                                        </ul>
-
-                                    </li>
-
-                                    <!--Mail-->
-                                    <li class="adomx-dropdown col-auto">
-                                        <a class="toggle" href="#"><i class="zmdi zmdi-email-open"></i><span class="badge"></span></a>
-
-                                        <!-- Dropdown -->
-                                        <div class="adomx-dropdown-menu dropdown-menu-mail">
-                                            <div class="head">
-                                                <h4 class="title">You have 3 new mail.</h4>
-                                            </div>
-                                            <div class="body custom-scroll">
-                                                <ul>
-                                                    <li>
-                                                        <a href="#">
-                                                            <div class="image"><img src="../assets/images/avatar/avatar-2.jpg" alt=""></div>
-                                                            <div class="content">
-                                                                <h6>Sub: New Account</h6>
-                                                                <p>There are many variations of passages of Lorem Ipsum available. </p>
-                                                            </div>
-                                                            <span class="reply"><i class="zmdi zmdi-mail-reply"></i></span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <div class="image"><img src="../assets/images/avatar/avatar-1.jpg" alt=""></div>
-                                                            <div class="content">
-                                                                <h6>Sub: Mail Support</h6>
-                                                                <p>There are many variations of passages of Lorem Ipsum available. </p>
-                                                            </div>
-                                                            <span class="reply"><i class="zmdi zmdi-mail-reply"></i></span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <div class="image"><img src="../assets/images/avatar/avatar-2.jpg" alt=""></div>
-                                                            <div class="content">
-                                                                <h6>Sub: Product inquiry</h6>
-                                                                <p>There are many variations of passages of Lorem Ipsum available. </p>
-                                                            </div>
-                                                            <span class="reply"><i class="zmdi zmdi-mail-reply"></i></span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <div class="image"><img src="../assets/images/avatar/avatar-1.jpg" alt=""></div>
-                                                            <div class="content">
-                                                                <h6>Sub: Mail Support</h6>
-                                                                <p>There are many variations of passages of Lorem Ipsum available. </p>
-                                                            </div>
-                                                            <span class="reply"><i class="zmdi zmdi-mail-reply"></i></span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-
-                                    </li>
-
-                                    <!--Notification-->
-                                    <li class="adomx-dropdown col-auto">
-                                        <a class="toggle" href="#"><i class="zmdi zmdi-notifications"></i><span class="badge"></span></a>
-
-                                        <!-- Dropdown -->
-                                        <div class="adomx-dropdown-menu dropdown-menu-notifications">
-                                            <div class="head">
-                                                <h5 class="title">You have 4 new notification.</h5>
-                                            </div>
-                                            <div class="body custom-scroll">
-                                                <ul>
-                                                    <li>
-                                                        <a href="#">
-                                                            <i class="zmdi zmdi-notifications-none"></i>
-                                                            <p>There are many variations of pages available.</p>
-                                                            <span>11.00 am Today</span>
-                                                        </a>
-                                                        <button class="delete"><i class="zmdi zmdi-close-circle-o"></i></button>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <i class="zmdi zmdi-block"></i>
-                                                            <p>There are many variations of pages available.</p>
-                                                            <span>11.00 am Today</span>
-                                                        </a>
-                                                        <button class="delete"><i class="zmdi zmdi-close-circle-o"></i></button>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <i class="zmdi zmdi-info-outline"></i>
-                                                            <p>There are many variations of pages available.</p>
-                                                            <span>11.00 am Today</span>
-                                                        </a>
-                                                        <button class="delete"><i class="zmdi zmdi-close-circle-o"></i></button>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <i class="zmdi zmdi-shield-security"></i>
-                                                            <p>There are many variations of pages available.</p>
-                                                            <span>11.00 am Today</span>
-                                                        </a>
-                                                        <button class="delete"><i class="zmdi zmdi-close-circle-o"></i></button>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <i class="zmdi zmdi-notifications-none"></i>
-                                                            <p>There are many variations of pages available.</p>
-                                                            <span>11.00 am Today</span>
-                                                        </a>
-                                                        <button class="delete"><i class="zmdi zmdi-close-circle-o"></i></button>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <i class="zmdi zmdi-block"></i>
-                                                            <p>There are many variations of pages available.</p>
-                                                            <span>11.00 am Today</span>
-                                                        </a>
-                                                        <button class="delete"><i class="zmdi zmdi-close-circle-o"></i></button>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <i class="zmdi zmdi-info-outline"></i>
-                                                            <p>There are many variations of pages available.</p>
-                                                            <span>11.00 am Today</span>
-                                                        </a>
-                                                        <button class="delete"><i class="zmdi zmdi-close-circle-o"></i></button>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <i class="zmdi zmdi-shield-security"></i>
-                                                            <p>There are many variations of pages available.</p>
-                                                            <span>11.00 am Today</span>
-                                                        </a>
-                                                        <button class="delete"><i class="zmdi zmdi-close-circle-o"></i></button>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <div class="footer">
-                                                <a href="#" class="view-all">view all</a>
-                                            </div>
-                                        </div>
-
-                                    </li>
-
-                                    <!--User-->
-                                    <li class="adomx-dropdown col-auto">
-                                        <a class="toggle" href="#">
-                                            <span class="user">
-                                                <span class="avatar">
-                                                    <img src="../assets/images/avatar/avatar-1.jpg" alt="">
-                                                    <span class="status"></span>
-                                                </span>
-                                                <span class="name">Madison Howard</span>
-                                            </span>
-                                        </a>
-
-                                        <!-- Dropdown -->
-                                        <div class="adomx-dropdown-menu dropdown-menu-user">
-                                            <div class="head">
-                                                <h5 class="name"><a href="#">Madison Howard</a></h5>
-                                                <a class="mail" href="#">mailnam@mail.com</a>
-                                            </div>
-                                            <div class="body">
-                                                <ul>
-                                                    <li><a href="#"><i class="zmdi zmdi-account"></i>Profile</a></li>
-                                                    <li><a href="#"><i class="zmdi zmdi-email-open"></i>Inbox</a></li>
-                                                    <li><a href="#"><i class="zmdi zmdi-wallpaper"></i>Activity</a></li>
-                                                </ul>
-                                                <ul>
-                                                    <li><a href="#"><i class="zmdi zmdi-settings"></i>Setting</a></li>
-                                                    <li><a href="#"><i class="zmdi zmdi-lock-open"></i>Sing out</a></li>
-                                                </ul>
-                                                <ul>
-                                                    <li><a href="#"><i class="zmdi zmdi-paypal"></i>Payment</a></li>
-                                                    <li><a href="#"><i class="zmdi zmdi-google-pages"></i>Invoice</a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-
-                                    </li>
-
-                                </ul>
-
-                            </div><!-- Header Notifications Area End -->
-
-                        </div>
-                    </div><!-- Header Right End -->
+                      <?php include '../partials/shared/top-nav.php';?>
+                    <!-- Header Right End -->
 
                 </div>
             </div>
@@ -307,7 +86,34 @@ include '../configuration/routes.php';
         <!-- Content Body Start -->
         <div class="content-body">
 
-        
+         <!-- BARANGAY MAP VIEWER START -->
+            <div class="row mbn-30 p-5">
+                <div class="col-12">
+                    <h2>Barangay Map Viewer</h2>
+                    <p>Search and explore saved barangays on the map below.</p>
+                    <div class="filters" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <input type="text" id="barangaySearch" placeholder="Search barangay name..." class="form-control"/>
+                        <select id="barangayProvinceFilter" class="form-control">
+                            <option value="">All Provinces</option>
+                            <?php foreach ($provinces as $prov): ?>
+                                <option value="<?= htmlspecialchars($prov['province_name']) ?>">
+                                    <?= htmlspecialchars($prov['province_name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <select id="municipalityFilter" class="form-control">
+                            <option value="">All Municipalities</option>
+                            <?php foreach ($municipalities as $mun): ?>
+                                <option value="<?= htmlspecialchars($mun['municipality']) ?>">
+                                    <?= htmlspecialchars($mun['municipality']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div id="barangayMap" style="height: 500px; width: 100%; border: 1px solid #ccc;"></div>
+                </div>
+            </div>
+            <!-- BARANGAY MAP VIEWER END -->
 
 
         </div><!-- Content Body End -->
@@ -358,7 +164,120 @@ include '../configuration/routes.php';
     <script src="../assets/js/plugins/vmap/maps/samples/jquery.vmap.sampledata.js"></script>
     <script src="../assets/js/plugins/vmap/vmap.active.js"></script>
     <!-- Leaflet JS for Map Viewer -->
-   
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        const barangays = <?= json_encode($barangays) ?>;
+
+        const barangayMap = L.map('barangayMap').setView([12.8797, 121.7740], 6);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(barangayMap);
+
+        let barangayLayers = [];
+        let barangayLayerMap = {}; // Map barangay_name (lowercase) to {layer, bounds}
+
+        function renderBarangays(filter = {}) {
+            // Remove old layers
+            barangayLayers.forEach(layer => barangayMap.removeLayer(layer));
+            barangayLayers = [];
+            barangayLayerMap = {};
+
+            barangays.forEach(b => {
+                // Filtering
+                if (filter.province && b.province_name !== filter.province) return;
+                if (filter.municipality && b.municipality !== filter.municipality) return;
+                if (filter.search && !b.barangay_name.toLowerCase().includes(filter.search.toLowerCase())) return;
+
+                // Skip if geojson is empty or invalid
+                if (!b.geojson || b.geojson.trim() === "") return;
+                let geojson;
+                try {
+                    geojson = JSON.parse(b.geojson);
+                } catch (e) {
+                    return; // Invalid geojson, skip
+                }
+                try {
+                    const layer = L.geoJSON(geojson).bindPopup(
+                        `<strong>${b.barangay_name}</strong><br>
+                 Municipality: ${b.municipality}<br>
+                 Province: ${b.province_name}`
+                    );
+                    layer.addTo(barangayMap);
+                    barangayLayers.push(layer);
+
+                    // Store for search/pan
+                    const bounds = layer.getBounds ? layer.getBounds() : null;
+                    barangayLayerMap[b.barangay_name.toLowerCase()] = {
+                        layer,
+                        bounds
+                    };
+                } catch (e) {
+                    // Invalid geojson, skip
+                }
+            });
+        }
+
+        // Initial render
+        renderBarangays();
+
+        // Filtering logic
+
+        document.getElementById('barangayProvinceFilter').addEventListener('change', function() {
+            const province = this.value;
+            // Update municipality filter options
+            const municipalitySelect = document.getElementById('municipalityFilter');
+            municipalitySelect.innerHTML = '<option value="">All Municipalities</option>';
+            const filteredMunicipalities = barangays
+                .filter(b => !province || b.province_name === province)
+                .map(b => b.municipality)
+                .filter((v, i, a) => a.indexOf(v) === i); // unique
+            filteredMunicipalities.forEach(mun => {
+                const opt = document.createElement('option');
+                opt.value = mun;
+                opt.textContent = mun;
+                municipalitySelect.appendChild(opt);
+            });
+            renderBarangays({
+                province,
+                municipality: municipalitySelect.value,
+                search: document.getElementById('barangaySearch').value
+            });
+        });
+
+        document.getElementById('municipalityFilter').addEventListener('change', function() {
+            renderBarangays({
+                province: document.getElementById('barangayProvinceFilter').value,
+                municipality: this.value,
+                search: document.getElementById('barangaySearch').value
+            });
+        });
+
+        document.getElementById('barangaySearch').addEventListener('input', function() {
+            const searchValue = this.value.trim().toLowerCase();
+            renderBarangays({
+                province: document.getElementById('barangayProvinceFilter').value,
+                municipality: document.getElementById('municipalityFilter').value,
+                search: searchValue
+            });
+
+            // Pan to exact match if found
+            if (searchValue && barangayLayerMap[searchValue]) {
+                const {
+                    layer,
+                    bounds
+                } = barangayLayerMap[searchValue];
+                if (bounds && bounds.isValid()) {
+                    barangayMap.fitBounds(bounds, {
+                        maxZoom: 16
+                    });
+                    // Open popup (if available)
+                    if (layer.getLayers && layer.getLayers().length > 0) {
+                        layer.getLayers()[0].openPopup();
+                    }
+                }
+            }
+        });
+    </script>
 
 </body>
 

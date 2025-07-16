@@ -41,66 +41,22 @@ include '../configuration/routes.php';
         <div class="header-section">
             <div class="container-fluid">
                 <div class="row justify-content-between align-items-center">
+
+                    <!-- Header Logo (Header Left) Start -->
                     <div class="header-logo col-auto">
-                        <a href="index.php">
+                        <a href="index.html">
                             <img src="../assets/images/logo/logo.png" alt="">
                             <img src="../assets/images/logo/logo-light.png" class="logo-light" alt="">
                         </a>
                     </div><!-- Header Logo (Header Left) End -->
-                    <div class="header-right flex-grow-1 col-auto">
-                        <div class="row justify-content-between align-items-center">
-                            <div class="col-auto">
-                                <div class="row align-items-center">
-                                    <div class="col-auto"><button class="side-header-toggle"><i class="zmdi zmdi-menu"></i></button></div>
-                                    <div class="col-auto">
-                                        <div class="header-search">
-                                            <button class="header-search-open d-block d-xl-none"><i class="zmdi zmdi-search"></i></button>
-                                            <div class="header-search-form">
-                                                <form action="#">
-                                                    <input type="text" placeholder="Search Here">
-                                                    <button><i class="zmdi zmdi-search"></i></button>
-                                                </form>
-                                                <button class="header-search-close d-block d-xl-none"><i class="zmdi zmdi-close"></i></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div><!-- Side Header Toggle & Search End -->
-                            <div class="col-auto">
-                                <ul class="header-notification-area">
-                                    <li class="adomx-dropdown position-relative col-auto">
-                                        <a class="toggle" href="#"><img class="lang-flag" src="../assets/images/flags/flag-1.jpg" alt=""><i class="zmdi zmdi-caret-down drop-arrow"></i></a>
-                                        <ul class="adomx-dropdown-menu dropdown-menu-language">
-                                            <li><a href="#"><img src="../assets/images/flags/flag-1.jpg" alt=""> English</a></li>
-                                            <li><a href="#"><img src="../assets/images/flags/flag-2.jpg" alt=""> Japanese</a></li>
-                                            <li><a href="#"><img src="../assets/images/flags/flag-3.jpg" alt=""> Spanish </a></li>
-                                            <li><a href="#"><img src="../assets/images/flags/flag-4.jpg" alt=""> Germany</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="adomx-dropdown col-auto">
-                                        <a class="toggle" href="#"><i class="zmdi zmdi-email-open"></i><span class="badge"></span></a>
-                                    </li>
-                                    <li class="adomx-dropdown col-auto">
-                                        <a class="toggle" href="#"><i class="zmdi zmdi-notifications"></i><span class="badge"></span></a>
-                                    </li>
-                                    <li class="adomx-dropdown col-auto">
-                                        <a class="toggle" href="#">
-                                            <span class="user">
-                                                <span class="avatar">
-                                                    <img src="../assets/images/avatar/avatar-1.jpg" alt="">
-                                                    <span class="status"></span>
-                                                </span>
-                                                <span class="name">Superadmin</span>
-                                            </span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div><!-- Header Right End -->
+
+                    <!-- Header Right Start -->
+                        <?php include '../partials/shared/top-nav.php'?>
+                    <!-- Header Right End -->
+
                 </div>
             </div>
-        </div><!-- Header Section End -->
+        </div>
         <!-- Side Header Start -->
         <div class="side-header show">
             <button class="side-header-close"><i class="zmdi zmdi-close"></i></button>
@@ -147,7 +103,18 @@ include '../configuration/routes.php';
               <label for="role" class="form-label">Role</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-user-tag"></i></span>
-                <input type="text" id="role" name="role_id" placeholder="<?= isset($role) ? $role : 'Select Role' ?>" autocomplete="off" class="form-control bg-light text-dark <?= onerror('role','danger')?>">
+                <select name="role_id" id="role" class="form-control bg-light text-dark">
+                  <?php 
+                    $stmt = $conn->query("SELECT * FROM roles");
+                    $stmt->execute();
+                    $roles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    foreach($roles as $role){
+                      echo <<<HTML
+                        <option value='{$role["id"]}'>{$role['role_name']}</option>
+                      HTML;
+                    }
+                  ?>
+                </select>
               </div>
             </div>
           </div>
@@ -173,6 +140,7 @@ include '../configuration/routes.php';
           </div>
         </form>
         <hr>
+        <!-- MUNICIPALITY REGISTRATION -->
         <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:stretch;">
           <!-- MUNICIPALITY REGISTRATION FORM -->
           <form action="../handler/superadmin/register_municipality.php" method="post" class="standard-form" onsubmit="return validateGeoJSON();" style="flex:1 1 350px; min-width:320px; max-width:500px;">
@@ -215,6 +183,67 @@ include '../configuration/routes.php';
             <div class="text-muted" style="font-size: 0.95em;">Use the polygon tool to draw the boundary of the municipality. Only one polygon is allowed.</div>
           </div>
         </div>
+        <!-- BARANGAY REGISTRATION -->
+          <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:stretch;">
+            <form action="../handler/superadmin/register_barangay.php" method="post" class="standard-form" onsubmit="return validateGeoJSONBarangay();" style="flex:1 1 350px; min-width:320px; max-width:500px;">
+              <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+              <div class="mb-3">
+                <label for="province_id" class="form-label">Province</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fa fa-map-marker"></i></span>
+                  <select name="province_id" id="province_id" required class="form-select bg-light text-dark">
+                    <?php
+                    $stmt = $conn->query("SELECT * FROM provinces");
+                    $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                    $stmt->execute();
+                    $res = $stmt->fetchAll();
+                    foreach ($res as $province) {
+                      echo <<<HTML
+                              <option value="{$province['id']}">{$province['province_name']}</option>
+                          HTML;
+                    }
+                    ?>
+                  </select>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="municipality" class="form-label">Municipality</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fa fa-landmark"></i></span>
+                  <select name="municipal_id" id="" class="form-control bg-light text-dark">
+                     <?php 
+                        $stmt = $conn->query("SELECT * FROM municipalities");
+                        $stmt->execute();
+                        $municipalitites = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        foreach($municipalitites as $municipality){
+                           echo <<<HTML
+                              <option value='{$municipality["id"]}'>{$municipality['municipality']}</option>
+                           HTML;
+                        }
+                     ?>
+                  </select>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="barangay" class="form-label">Barangay</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fa fa-landmark"></i></span>
+                  <input type="text" name="barangay" placeholder="Enter barangay" required class="form-control bg-light text-dark">
+                </div>
+              </div>
+              <input type="hidden" name="geojson" id="geojson_barangay">
+              <div class="mt-4 text-end">
+                <button type="submit" class="btn btn-info"><i class="fa fa-location-arrow"></i> Submit</button>
+              </div>
+            </form>
+            <!-- MAP OUTSIDE FORM -->
+            <div style="flex:1 1 350px; min-width:320px; max-width:600px; display:flex; flex-direction:column;">
+              <label style="display: block; font-weight: bold; margin: 10px 0 5px;">Draw Barangay Boundary:</label>
+              <div id="map_barangay" style="width:100%; height:400px; border:1px solid #ccc; border-radius:8px;"></div>
+              <div class="text-muted" style="font-size: 0.95em;">Use the polygon tool to draw the boundary of the barangay. Only one polygon is allowed.</div>
+            </div>
+        </div>
+
         </div><!-- Content Body End -->
         <!-- Footer Section Start -->
         <div class="footer-section">
@@ -283,6 +312,44 @@ include '../configuration/routes.php';
       }
       setTimeout(() => {
         map.invalidateSize();
+      }, 200);
+
+      // Barangay Map
+      const mapBarangay = L.map('map_barangay').setView([10.3157, 123.8854], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(mapBarangay);
+      const drawnItemsBarangay = new L.FeatureGroup();
+      mapBarangay.addLayer(drawnItemsBarangay);
+      const drawControlBarangay = new L.Control.Draw({
+        edit: { featureGroup: drawnItemsBarangay },
+        draw: {
+          polygon: true,
+          polyline: false,
+          rectangle: false,
+          circle: false,
+          marker: false,
+          circlemarker: false
+        }
+      });
+      mapBarangay.addControl(drawControlBarangay);
+      mapBarangay.on(L.Draw.Event.CREATED, function(e) {
+        drawnItemsBarangay.clearLayers();
+        const layer = e.layer;
+        drawnItemsBarangay.addLayer(layer);
+        const geojson = JSON.stringify(layer.toGeoJSON());
+        document.getElementById('geojson_barangay').value = geojson;
+      });
+      function validateGeoJSONBarangay() {
+        const geojson = document.getElementById('geojson_barangay').value;
+        if (!geojson) {
+          alert("Please draw a polygon on the map.");
+          return false;
+        }
+        return true;
+      }
+      setTimeout(() => {
+        mapBarangay.invalidateSize();
       }, 200);
     </script>
 </body>
