@@ -19,7 +19,8 @@ $municipal_official = [
 
 $barangay_official = [
     '/index',
-    'barangayofficial/index.php'
+    'barangayofficial/index.php',
+    'barangayofficial/registration.php'
 ];
 
 $visitor = [

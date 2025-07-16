@@ -86,6 +86,7 @@ include '../configuration/routes.php';
                 <div class="input-group">
                   <span class="input-group-text"><i class="fa fa-map-marker"></i></span>
                   <select name="province_id" id="province_id" required class="form-select bg-light text-dark">
+                    <option value="">Select Province</option>
                     <?php
                     $stmt = $conn->query("SELECT * FROM provinces");
                     $stmt->setFetchMode(PDO::FETCH_ASSOC);
@@ -101,20 +102,11 @@ include '../configuration/routes.php';
                 </div>
               </div>
               <div class="mb-3">
-                <label for="municipality" class="form-label">Municipality</label>
+                <label for="municipal_id" class="form-label">Municipality</label>
                 <div class="input-group">
                   <span class="input-group-text"><i class="fa fa-landmark"></i></span>
-                  <select name="municipal_id" id="" class="form-control bg-light text-dark">
-                     <?php 
-                        $stmt = $conn->query("SELECT * FROM municipalities");
-                        $stmt->execute();
-                        $municipalitites = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                        foreach($municipalitites as $municipality){
-                           echo <<<HTML
-                              <option value='{$municipality["id"]}'>{$municipality['municipality']}</option>
-                           HTML;
-                        }
-                     ?>
+                  <select name="municipal_id" id="municipal_id" class="form-control bg-light text-dark" required disabled>
+                    <option value="">Select Municipality</option>
                   </select>
                 </div>
               </div>
@@ -231,6 +223,30 @@ include '../configuration/routes.php';
       }, 200);
     </script>
 
+    <!-- Move the custom script here, after jQuery is loaded -->
+    <script>
+    $(document).ready(function() {
+        // When province changes, fetch municipalities
+        $('#province_id').on('change', function() {
+            var provinceId = $(this).val();
+            $('#municipal_id').prop('disabled', true).html('<option value="">Select Municipality</option>');
+            if (provinceId) {
+                $.get('/handler/barangayofficial/get_municipalities.php', { province_id: provinceId }, function(data) {
+                    var options = '<option value="">Select Municipality</option>';
+                    if (Array.isArray(data) && data.length > 0) {
+                        data.forEach(function(m) {
+                            options += '<option value="' + m.id + '">' + m.municipality + '</option>';
+                        });
+                        $('#municipal_id').html(options).prop('disabled', false);
+                    } else {
+                        options += '<option value="" disabled>No municipalities found</option>';
+                        $('#municipal_id').html(options).prop('disabled', false);
+                    }
+                }, 'json');
+            }
+        });
+    });
+    </script>
 
 </body>
 

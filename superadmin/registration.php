@@ -4,7 +4,6 @@ include '../configuration/routes.php';
 ?>
 <!doctype html>
 <html class="no-js" lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -74,177 +73,184 @@ include '../configuration/routes.php';
    
         }
         ?>
-        <!-- USER REGISTRATION FORM -->
-        <form action="../handler/superadmin/register.php" method="post" class="standard-form">
-          <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-          <div class="row g-3">
-            <div class="col-md-3">
-              <label for="name" class="form-label">Name</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="fa fa-user"></i></span>
-                <input type="text" id="name" name="name" placeholder="<?= $name ?? 'Enter name'?>" autocomplete="off" class="form-control bg-light text-dark <?php onerror('name','danger','')?>">
-              </div>
+        <div class="container mt-5">
+          <!-- USER REGISTRATION FORM -->
+          <div class="box mb-4">
+            <div class="box-head">
+              <h4 class="title">User Registration</h4>
             </div>
-            <div class="col-md-3">
-              <label for="email" class="form-label">Email</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="fa fa-envelope"></i></span>
-                <input type="text" id="email" name="email" placeholder="<?= $email ?? 'Enter Email'?>" autocomplete="off" class="form-control bg-light text-dark <?= onerror('email','danger')?>">
-              </div>
+            <div class="box-body">
+              <form action="../handler/superadmin/register.php" method="post" class="standard-form">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                <div class="row mbn-20">
+                  <div class="col-12 mb-20">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" placeholder="<?= $name ?? 'Enter name'?>" autocomplete="off" class="form-control <?php onerror('name','danger','') ?>">
+                  </div>
+                  <div class="col-12 mb-20">
+                    <label for="email">Email</label>
+                    <input type="text" id="email" name="email" placeholder="<?= $email ?? 'Enter Email'?>" autocomplete="off" class="form-control <?= onerror('email','danger')?>">
+                  </div>
+                  <div class="col-12 mb-20">
+                    <label for="password">Password</label>
+                    <input type="text" id="password" name="password" placeholder="<?= $password ?? 'Enter Password '?>" autocomplete="off" class="form-control <?= onerror('password','danger')?>">
+                  </div>
+                  <div class="col-12 mb-20">
+                    <label for="role">Role</label>
+                    <select name="role_id" id="role" class="form-control">
+                      <?php 
+                        $stmt = $conn->query("SELECT * FROM roles");
+                        $stmt->execute();
+                        $roles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        foreach($roles as $role){
+                          echo <<<HTML
+                            <option value='{$role["id"]}'>{$role['role_name']}</option>
+                          HTML;
+                        }
+                      ?>
+                    </select>
+                  </div>
+                  <div class="col-12 mb-20">
+                    <input type="submit" value="Submit" class="button button-primary">
+                  </div>
+                </div>
+              </form>
             </div>
-            <div class="col-md-3">
-              <label for="password" class="form-label">Password</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="fa fa-lock"></i></span>
-                <input type="text" id="password" name="password" placeholder="<?= $password ?? 'Enter Password '?>" autocomplete="off" class="form-control bg-light text-dark <?= onerror('password','danger')?>">
-              </div>
+          </div>
+          <!-- PROVINCE REGISTRATION FORM -->
+          <div class="box mb-4">
+            <div class="box-head">
+              <h4 class="title">Province Registration</h4>
             </div>
-            <div class="col-md-3">
-              <label for="role" class="form-label">Role</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="fa fa-user-tag"></i></span>
-                <select name="role_id" id="role" class="form-control bg-light text-dark">
-                  <?php 
-                    $stmt = $conn->query("SELECT * FROM roles");
-                    $stmt->execute();
-                    $roles = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    foreach($roles as $role){
-                      echo <<<HTML
-                        <option value='{$role["id"]}'>{$role['role_name']}</option>
-                      HTML;
-                    }
-                  ?>
-                </select>
+            <div class="box-body">
+              <form action="../handler/superadmin/register_province.php" method="post" class="standard-form">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                <div class="row g-3 align-items-end">
+                  <div class="col-md-8">
+                    <label for="province" class="form-label">Province</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="fa fa-map-marker-alt"></i></span>
+                      <input type="text" name="province_name" placeholder="<?php echo $province_name ?? 'Enter Province Name'?>" class="form-control <?= onerror('province_name','danger')?>">
+                    </div>
+                  </div>
+                  <div class="col-md-4 text-end">
+                    <button class="btn btn-success w-100"><i class="fa fa-plus"></i> Submit</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <!-- MUNICIPALITY REGISTRATION -->
+          <div class="box mb-4">
+            <div class="box-head">
+              <h4 class="title">Municipality Registration</h4>
+            </div>
+            <div class="box-body">
+              <div class="row g-4 align-items-stretch">
+                <div class="col-12 col-lg-6 d-flex">
+                  <form action="../handler/superadmin/register_municipality.php" method="post" class="standard-form flex-fill" onsubmit="return validateGeoJSON();">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                    <div class="mb-3">
+                      <label for="province_id" class="form-label">Province</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-map-marker"></i></span>
+                        <select name="province_id" id="province_id" required class="form-control">
+                          <?php
+                          $stmt = $conn->query("SELECT * FROM provinces");
+                          $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                          $stmt->execute();
+                          $res = $stmt->fetchAll();
+                          foreach ($res as $province) {
+                            echo <<<HTML
+                                    <option value="{$province['id']}">{$province['province_name']}</option>
+                                HTML;
+                          }
+                          ?>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label for="municipality" class="form-label">Municipality</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-landmark"></i></span>
+                        <input type="text" name="municipality" placeholder="Enter Municipality" required class="form-control">
+                      </div>
+                    </div>
+                    <input type="hidden" name="geojson" id="geojson">
+                    <div class="mt-4 text-end">
+                      <button type="submit" class="btn btn-info"><i class="fa fa-location-arrow"></i> Submit</button>
+                    </div>
+                  </form>
+                </div>
+                <div class="col-12 col-lg-6 d-flex flex-column">
+                  <label class="fw-bold mb-2">Draw Municipality Boundary:</label>
+                  <div id="map" style="width:100%; height:400px; border:1px solid #ccc; border-radius:8px;"></div>
+                  <div class="text-muted mt-2" style="font-size: 0.95em;">Use the polygon tool to draw the boundary of the municipality. Only one polygon is allowed.</div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="mt-4 text-end">
-            <button class="btn btn-primary"><i class="fa fa-paper-plane"></i> Submit</button>
-          </div>
-        </form>
-        <hr>
-        <!-- PROVINCE REGISTRATION FORM -->
-        <form action="../handler/superadmin/register_province.php" method="post" class="standard-form">
-          <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-          <div class="row g-3 align-items-end">
-            <div class="col-md-6">
-              <label for="province" class="form-label">Province</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="fa fa-map-marker-alt"></i></span>
-                <input type="text" name="province_name" placeholder="<?php echo $province_name ?? 'Enter Province Name'?>" class="form-control bg-light text-dark <?= onerror('province_name','danger')?>">
+          <!-- BARANGAY REGISTRATION -->
+          <div class="box mb-4">
+            <div class="box-head">
+              <h4 class="title">Barangay Registration</h4>
+            </div>
+            <div class="box-body">
+              <div class="row g-4 align-items-stretch">
+                <div class="col-12 col-lg-6 d-flex">
+                  <form action="../handler/superadmin/register_barangay.php" method="post" class="standard-form flex-fill" onsubmit="return validateGeoJSONBarangay();">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                    <div class="mb-3">
+                      <label for="province_id" class="form-label">Province</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-map-marker"></i></span>
+                        <select name="province_id" id="province_id_barangay" required class="form-control">
+                          <option value="">Select Province</option>
+                          <?php
+                          $stmt = $conn->query("SELECT * FROM provinces");
+                          $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                          $stmt->execute();
+                          $res = $stmt->fetchAll();
+                          foreach ($res as $province) {
+                            echo <<<HTML
+                                    <option value="{$province['id']}">{$province['province_name']}</option>
+                                HTML;
+                          }
+                          ?>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label for="municipal_id_barangay" class="form-label">Municipality</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-landmark"></i></span>
+                        <select name="municipal_id" id="municipal_id_barangay" class="form-control" required disabled>
+                          <option value="">Select Municipality</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label for="barangay" class="form-label">Barangay</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-landmark"></i></span>
+                        <input type="text" name="barangay" placeholder="Enter barangay" required class="form-control">
+                      </div>
+                    </div>
+                    <input type="hidden" name="geojson" id="geojson_barangay">
+                    <div class="mt-4 text-end">
+                      <button type="submit" class="btn btn-warning text-dark"><i class="fa fa-location-arrow"></i> Submit</button>
+                    </div>
+                  </form>
+                </div>
+                <div class="col-12 col-lg-6 d-flex flex-column">
+                  <label class="fw-bold mb-2">Draw Barangay Boundary:</label>
+                  <div id="map_barangay" style="width:100%; height:400px; border:1px solid #ccc; border-radius:8px;"></div>
+                  <div class="text-muted mt-2" style="font-size: 0.95em;">Use the polygon tool to draw the boundary of the barangay. Only one polygon is allowed.</div>
+                </div>
               </div>
             </div>
-            <div class="col-md-6 text-end">
-              <button class="btn btn-success"><i class="fa fa-plus"></i> Submit</button>
-            </div>
-          </div>
-        </form>
-        <hr>
-        <!-- MUNICIPALITY REGISTRATION -->
-        <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:stretch;">
-          <!-- MUNICIPALITY REGISTRATION FORM -->
-          <form action="../handler/superadmin/register_municipality.php" method="post" class="standard-form" onsubmit="return validateGeoJSON();" style="flex:1 1 350px; min-width:320px; max-width:500px;">
-            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-            <div class="mb-3">
-              <label for="province_id" class="form-label">Province</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="fa fa-map-marker"></i></span>
-                <select name="province_id" id="province_id" required class="form-select bg-light text-dark">
-                  <?php
-                  $stmt = $conn->query("SELECT * FROM provinces");
-                  $stmt->setFetchMode(PDO::FETCH_ASSOC);
-                  $stmt->execute();
-                  $res = $stmt->fetchAll();
-                  foreach ($res as $province) {
-                    echo <<<HTML
-                            <option value="{$province['id']}">{$province['province_name']}</option>
-                        HTML;
-                  }
-                  ?>
-                </select>
-              </div>
-            </div>
-            <div class="mb-3">
-              <label for="municipality" class="form-label">Municipality</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="fa fa-landmark"></i></span>
-                <input type="text" name="municipality" placeholder="Enter Municipality" required class="form-control bg-light text-dark">
-              </div>
-            </div>
-            <input type="hidden" name="geojson" id="geojson">
-            <div class="mt-4 text-end">
-              <button type="submit" class="btn btn-info"><i class="fa fa-location-arrow"></i> Submit</button>
-            </div>
-          </form>
-          <!-- MAP OUTSIDE FORM -->
-          <div style="flex:1 1 350px; min-width:320px; max-width:600px; display:flex; flex-direction:column;">
-            <label style="display: block; font-weight: bold; margin: 10px 0 5px;">Draw Municipality Boundary:</label>
-            <div id="map" style="width:100%; height:400px; border:1px solid #ccc; border-radius:8px;"></div>
-            <div class="text-muted" style="font-size: 0.95em;">Use the polygon tool to draw the boundary of the municipality. Only one polygon is allowed.</div>
           </div>
         </div>
-        <!-- BARANGAY REGISTRATION -->
-          <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:stretch;">
-            <form action="../handler/superadmin/register_barangay.php" method="post" class="standard-form" onsubmit="return validateGeoJSONBarangay();" style="flex:1 1 350px; min-width:320px; max-width:500px;">
-              <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-              <div class="mb-3">
-                <label for="province_id" class="form-label">Province</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="fa fa-map-marker"></i></span>
-                  <select name="province_id" id="province_id" required class="form-select bg-light text-dark">
-                    <?php
-                    $stmt = $conn->query("SELECT * FROM provinces");
-                    $stmt->setFetchMode(PDO::FETCH_ASSOC);
-                    $stmt->execute();
-                    $res = $stmt->fetchAll();
-                    foreach ($res as $province) {
-                      echo <<<HTML
-                              <option value="{$province['id']}">{$province['province_name']}</option>
-                          HTML;
-                    }
-                    ?>
-                  </select>
-                </div>
-              </div>
-              <div class="mb-3">
-                <label for="municipality" class="form-label">Municipality</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="fa fa-landmark"></i></span>
-                  <select name="municipal_id" id="" class="form-control bg-light text-dark">
-                     <?php 
-                        $stmt = $conn->query("SELECT * FROM municipalities");
-                        $stmt->execute();
-                        $municipalitites = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                        foreach($municipalitites as $municipality){
-                           echo <<<HTML
-                              <option value='{$municipality["id"]}'>{$municipality['municipality']}</option>
-                           HTML;
-                        }
-                     ?>
-                  </select>
-                </div>
-              </div>
-              <div class="mb-3">
-                <label for="barangay" class="form-label">Barangay</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="fa fa-landmark"></i></span>
-                  <input type="text" name="barangay" placeholder="Enter barangay" required class="form-control bg-light text-dark">
-                </div>
-              </div>
-              <input type="hidden" name="geojson" id="geojson_barangay">
-              <div class="mt-4 text-end">
-                <button type="submit" class="btn btn-info"><i class="fa fa-location-arrow"></i> Submit</button>
-              </div>
-            </form>
-            <!-- MAP OUTSIDE FORM -->
-            <div style="flex:1 1 350px; min-width:320px; max-width:600px; display:flex; flex-direction:column;">
-              <label style="display: block; font-weight: bold; margin: 10px 0 5px;">Draw Barangay Boundary:</label>
-              <div id="map_barangay" style="width:100%; height:400px; border:1px solid #ccc; border-radius:8px;"></div>
-              <div class="text-muted" style="font-size: 0.95em;">Use the polygon tool to draw the boundary of the barangay. Only one polygon is allowed.</div>
-            </div>
-          </div>
-
-        </div><!-- Content Body End -->
         <!-- Footer Section Start -->
         <div class="footer-section">
             <div class="container-fluid">
@@ -352,6 +358,29 @@ include '../configuration/routes.php';
         mapBarangay.invalidateSize();
       }, 200);
     </script>
+    <script>
+$(document).ready(function() {
+    // Cascading for Barangay Registration
+    $('#province_id_barangay').on('change', function() {
+        var provinceId = $(this).val();
+        $('#municipal_id_barangay').prop('disabled', true).html('<option value="">Select Municipality</option>');
+        if (provinceId) {
+            $.get('/handler/barangayofficial/get_municipalities.php', { province_id: provinceId }, function(data) {
+                var options = '<option value="">Select Municipality</option>';
+                if (Array.isArray(data) && data.length > 0) {
+                    data.forEach(function(m) {
+                        options += '<option value="' + m.id + '">' + m.municipality + '</option>';
+                    });
+                    $('#municipal_id_barangay').html(options).prop('disabled', false);
+                } else {
+                    options += '<option value="" disabled>No municipalities found</option>';
+                    $('#municipal_id_barangay').html(options).prop('disabled', false);
+                }
+            }, 'json');
+        }
+    });
+});
+</script>
 </body>
 </html>
 <?php unset($_SESSION['errors'])?>

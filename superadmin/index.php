@@ -26,6 +26,9 @@ $barangays = $conn->query("
 
 // Fetch all municipalities for filter dropdown (for barangay filter)
 $municipalitiesDropdown = $conn->query("SELECT * FROM municipalities")->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch all houses for the map
+$houses = $conn->query("SELECT * FROM houses")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!doctype html>
 <html class="no-js" lang="en">
@@ -98,7 +101,7 @@ $municipalitiesDropdown = $conn->query("SELECT * FROM municipalities")->fetchAll
         <div class="side-header show">
             <button class="side-header-close"><i class="zmdi zmdi-close"></i></button>
             <!-- Side Header Inner Start -->
-            <?= include '../partials/superadmin/nav.php' ?>
+            <?php include '../partials/superadmin/nav.php' ?>
             <!-- Side Header Inner End -->
         </div>
 
@@ -409,6 +412,46 @@ $municipalitiesDropdown = $conn->query("SELECT * FROM municipalities")->fetchAll
             </div>
             <!-- BARANGAY MAP VIEWER END -->
 
+            <!-- HOUSE MAP AND BARANGAY BOUNDARY VIEW-->
+            <div class="row mbn-30 p-5">
+                <div class="col-12">
+                    <h2>House Map & Barangay Boundary Viewer</h2>
+                    <p>View all houses and barangay boundaries. Use the filters to explore.</p>
+                    <div class="row mb-3">
+                        <div class="col-md-4 mb-2">
+                            <input type="text" id="houseSearch" class="form-control" placeholder="Search house number or street...">
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <select id="houseProvinceFilter" class="form-control">
+                                <option value="">All Provinces</option>
+                                <?php foreach ($provinces as $prov): ?>
+                                    <option value="<?= $prov['id'] ?>"><?= htmlspecialchars($prov['province_name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <select id="houseMunicipalityFilter" class="form-control">
+                                <option value="">All Municipalities</option>
+                                <?php foreach ($municipalities as $mun): ?>
+                                    <option value="<?= $mun['id'] ?>"><?= htmlspecialchars($mun['municipality']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <select id="houseBarangayFilter" class="form-control">
+                                <option value="">All Barangays</option>
+                                <?php foreach ($barangays as $brgy): ?>
+                                    <option value="<?= $brgy['id'] ?>"><?= htmlspecialchars($brgy['barangay_name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="houseMap" style="height: 500px; width: 100%; border: 1px solid #ccc;"></div>
+                </div>
+            </div>
+            <!-- HOUSE MAP AND BARANGAY BOUNDARY VIEW END-->
+             
+
         </div><!-- Content Body End -->
 
         <!-- Footer Section Start -->
@@ -540,6 +583,7 @@ $municipalitiesDropdown = $conn->query("SELECT * FROM municipalities")->fetchAll
             barangayLayers.forEach(layer => barangayMap.removeLayer(layer));
             barangayLayers = [];
             barangayLayerMap = {};
+            let visibleLayers = [];
 
             barangays.forEach(b => {
                 // Filtering
@@ -563,13 +607,37 @@ $municipalitiesDropdown = $conn->query("SELECT * FROM municipalities")->fetchAll
                         layer,
                         bounds
                     };
+                    visibleLayers.push(layer);
                 } catch (e) {
                     // Invalid geojson, skip
                 }
             });
+
+            // Only pan/zoom if a filter is actually applied
+            const filterApplied = filter.province || filter.municipality || (filter.search && filter.search.trim() !== '');
+            if (filterApplied) {
+                setTimeout(() => {
+                    if (visibleLayers.length === 1) {
+                        const bounds = visibleLayers[0].getBounds();
+                        if (bounds && bounds.isValid()) {
+                            barangayMap.fitBounds(bounds, { maxZoom: 16 });
+                            // Open popup if available
+                            if (visibleLayers[0].getLayers && visibleLayers[0].getLayers().length > 0) {
+                                visibleLayers[0].getLayers()[0].openPopup();
+                            }
+                        }
+                    } else if (visibleLayers.length > 1) {
+                        const group = L.featureGroup(visibleLayers);
+                        barangayMap.fitBounds(group.getBounds());
+                    }
+                }, 200);
+            } else {
+                // Reset to default Philippines view
+                barangayMap.setView([12.8797, 121.7740], 6);
+            }
         }
 
-        // Initial render
+        // Initial render (no filter)
         renderBarangays();
 
         // Filtering logic
@@ -611,24 +679,157 @@ $municipalitiesDropdown = $conn->query("SELECT * FROM municipalities")->fetchAll
                 municipality: document.getElementById('municipalityFilter').value,
                 search: searchValue
             });
-
-            // Pan to exact match if found
-            if (searchValue && barangayLayerMap[searchValue]) {
-                const {
-                    layer,
-                    bounds
-                } = barangayLayerMap[searchValue];
-                if (bounds && bounds.isValid()) {
-                    barangayMap.fitBounds(bounds, {
-                        maxZoom: 16
-                    });
-                    // Open popup (if available)
-                    if (layer.getLayers && layer.getLayers().length > 0) {
-                        layer.getLayers()[0].openPopup();
-                    }
-                }
-            }
         });
+    </script>
+    <script>
+        const allHouses = <?= json_encode($houses) ?>;
+        const allBarangays = <?= json_encode($barangays) ?>;
+        const allMunicipalities = <?= json_encode($municipalities) ?>;
+        const allProvinces = <?= json_encode($provinces) ?>;
+        let mapCenter = [12.8797, 121.7740];
+        let mapZoom = 6;
+        let houseMap = L.map('houseMap').setView(mapCenter, mapZoom);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(houseMap);
+        let boundaryLayer = null;
+        let houseMarkers = [];
+
+        function filterHouseData() {
+            const provinceId = document.getElementById('houseProvinceFilter').value;
+            const municipalityId = document.getElementById('houseMunicipalityFilter').value;
+            const barangayId = document.getElementById('houseBarangayFilter').value;
+            const search = document.getElementById('houseSearch').value.trim().toLowerCase();
+
+            // Filter barangays
+            let filteredBarangays = allBarangays;
+            if (provinceId) filteredBarangays = filteredBarangays.filter(b => b.province_id == provinceId);
+            if (municipalityId) filteredBarangays = filteredBarangays.filter(b => b.municipal_id == municipalityId);
+            if (barangayId) filteredBarangays = filteredBarangays.filter(b => b.id == barangayId);
+
+            // Filter houses
+            let filteredHouses = allHouses;
+            if (barangayId) {
+                filteredHouses = filteredHouses.filter(h => h.barangay_id == barangayId);
+            } else if (municipalityId) {
+                const brgyIds = filteredBarangays.map(b => b.id);
+                filteredHouses = filteredHouses.filter(h => brgyIds.includes(Number(h.barangay_id)));
+            } else if (provinceId) {
+                const brgyIds = filteredBarangays.map(b => b.id);
+                filteredHouses = filteredHouses.filter(h => brgyIds.includes(Number(h.barangay_id)));
+            }
+            if (search) {
+                filteredHouses = filteredHouses.filter(h =>
+                    (h.house_number && h.house_number.toString().includes(search)) ||
+                    (h.street_name && h.street_name.toLowerCase().includes(search))
+                );
+            }
+            return { filteredBarangays, filteredHouses, barangayId };
+        }
+
+        function updateHouseMap() {
+            // Remove old boundary
+            if (boundaryLayer) {
+                houseMap.removeLayer(boundaryLayer);
+                boundaryLayer = null;
+            }
+            // Remove old markers
+            houseMarkers.forEach(m => houseMap.removeLayer(m));
+            houseMarkers = [];
+
+            const { filteredBarangays, filteredHouses, barangayId } = filterHouseData();
+
+            // Draw barangay boundary if only one barangay selected
+            let fitBounds = false;
+            if (barangayId && filteredBarangays.length === 1 && filteredBarangays[0].geojson) {
+                try {
+                    const geojson = JSON.parse(filteredBarangays[0].geojson);
+                    boundaryLayer = L.geoJSON(geojson, {
+                        style: { color: '#007bff', weight: 2, fillOpacity: 0.1 }
+                    }).addTo(houseMap);
+                    fitBounds = true;
+                } catch (e) {}
+            }
+
+            // Draw house markers
+            let markerGroup = [];
+            filteredHouses.forEach(house => {
+                if (!house.geojson) return;
+                let coords = null;
+                try {
+                    const geometry = JSON.parse(house.geojson);
+                    if (geometry.type === 'Point') {
+                        coords = [geometry.coordinates[1], geometry.coordinates[0]];
+                    }
+                } catch (e) {}
+                if (coords) {
+                    const marker = L.marker(coords).addTo(houseMap)
+                        .bindPopup(`<strong>House #${house.house_number}</strong><br>Street: ${house.street_name}`);
+                    houseMarkers.push(marker);
+                    markerGroup.push(marker);
+                }
+            });
+
+            // Fit map
+            if (fitBounds && boundaryLayer) {
+                setTimeout(() => {
+                    houseMap.fitBounds(boundaryLayer.getBounds());
+                }, 200);
+            } else if (markerGroup.length > 0) {
+                const group = L.featureGroup(markerGroup);
+                setTimeout(() => {
+                    houseMap.fitBounds(group.getBounds(), { maxZoom: 16 });
+                }, 200);
+            } else {
+                houseMap.setView(mapCenter, mapZoom);
+            }
+        }
+
+        // Filter dropdown logic
+        document.getElementById('houseProvinceFilter').addEventListener('change', function() {
+            const provinceId = this.value;
+            // Update municipalities
+            const munSel = document.getElementById('houseMunicipalityFilter');
+            munSel.innerHTML = '<option value="">All Municipalities</option>';
+            allMunicipalities.filter(m => !provinceId || m.province_id == provinceId).forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.id;
+                opt.textContent = m.municipality;
+                munSel.appendChild(opt);
+            });
+            // Update barangays
+            const brgySel = document.getElementById('houseBarangayFilter');
+            brgySel.innerHTML = '<option value="">All Barangays</option>';
+            allBarangays.filter(b => !provinceId || b.province_id == provinceId).forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b.id;
+                opt.textContent = b.barangay_name;
+                brgySel.appendChild(opt);
+            });
+            updateHouseMap();
+        });
+        document.getElementById('houseMunicipalityFilter').addEventListener('change', function() {
+            const municipalityId = this.value;
+            const provinceId = document.getElementById('houseProvinceFilter').value;
+            // Update barangays
+            const brgySel = document.getElementById('houseBarangayFilter');
+            brgySel.innerHTML = '<option value="">All Barangays</option>';
+            allBarangays.filter(b => (!provinceId || b.province_id == provinceId) && (!municipalityId || b.municipal_id == municipalityId)).forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b.id;
+                opt.textContent = b.barangay_name;
+                brgySel.appendChild(opt);
+            });
+            updateHouseMap();
+        });
+        document.getElementById('houseBarangayFilter').addEventListener('change', function() {
+            updateHouseMap();
+        });
+        document.getElementById('houseSearch').addEventListener('input', function() {
+            updateHouseMap();
+        });
+        // Initial map render
+        updateHouseMap();
     </script>
 
 </body>

@@ -1,6 +1,14 @@
 <?php
 include '../configuration/config.php';
 include '../configuration/routes.php';
+// Fetch all provinces
+$provinces = $conn->query("SELECT * FROM provinces ORDER BY province_name ASC")->fetchAll(PDO::FETCH_ASSOC);
+// Fetch all municipalities
+$municipalities = $conn->query("SELECT * FROM municipalities ORDER BY municipality ASC")->fetchAll(PDO::FETCH_ASSOC);
+// Fetch all barangays
+$barangays = $conn->query("SELECT * FROM barangays ORDER BY barangay_name ASC")->fetchAll(PDO::FETCH_ASSOC);
+// Fetch all houses
+$houses = $conn->query("SELECT * FROM houses")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!doctype html>
 <html class="no-js" lang="en">
@@ -62,240 +70,8 @@ include '../configuration/routes.php';
                     </div><!-- Header Logo (Header Left) End -->
 
                     <!-- Header Right Start -->
-                    <div class="header-right flex-grow-1 col-auto">
-                        <div class="row justify-content-between align-items-center">
-
-                            <!-- Side Header Toggle & Search Start -->
-                            <div class="col-auto">
-                                <div class="row align-items-center">
-
-                                    <!--Side Header Toggle-->
-                                    <div class="col-auto"><button class="side-header-toggle"><i class="zmdi zmdi-menu"></i></button></div>
-
-                                    <!--Header Search-->
-                                    <div class="col-auto">
-
-                                        <div class="header-search">
-
-                                            <button class="header-search-open d-block d-xl-none"><i class="zmdi zmdi-search"></i></button>
-
-                                            <div class="header-search-form">
-                                                <form action="#">
-                                                    <input type="text" placeholder="Search Here">
-                                                    <button><i class="zmdi zmdi-search"></i></button>
-                                                </form>
-                                                <button class="header-search-close d-block d-xl-none"><i class="zmdi zmdi-close"></i></button>
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div><!-- Side Header Toggle & Search End -->
-
-                            <!-- Header Notifications Area Start -->
-                            <div class="col-auto">
-
-                                <ul class="header-notification-area">
-
-                                    <!--Language-->
-                                    <li class="adomx-dropdown position-relative col-auto">
-                                        <a class="toggle" href="#"><img class="lang-flag" src="../assets/images/flags/flag-1.jpg" alt=""><i class="zmdi zmdi-caret-down drop-arrow"></i></a>
-
-                                        <!-- Dropdown -->
-                                        <ul class="adomx-dropdown-menu dropdown-menu-language">
-                                            <li><a href="#"><img src="../assets/images/flags/flag-1.jpg" alt=""> English</a></li>
-                                            <li><a href="#"><img src="../assets/images/flags/flag-2.jpg" alt=""> Japanese</a></li>
-                                            <li><a href="#"><img src="../assets/images/flags/flag-3.jpg" alt=""> Spanish </a></li>
-                                            <li><a href="#"><img src="../assets/images/flags/flag-4.jpg" alt=""> Germany</a></li>
-                                        </ul>
-
-                                    </li>
-
-                                    <!--Mail-->
-                                    <li class="adomx-dropdown col-auto">
-                                        <a class="toggle" href="#"><i class="zmdi zmdi-email-open"></i><span class="badge"></span></a>
-
-                                        <!-- Dropdown -->
-                                        <div class="adomx-dropdown-menu dropdown-menu-mail">
-                                            <div class="head">
-                                                <h4 class="title">You have 3 new mail.</h4>
-                                            </div>
-                                            <div class="body custom-scroll">
-                                                <ul>
-                                                    <li>
-                                                        <a href="#">
-                                                            <div class="image"><img src="../assets/images/avatar/avatar-2.jpg" alt=""></div>
-                                                            <div class="content">
-                                                                <h6>Sub: New Account</h6>
-                                                                <p>There are many variations of passages of Lorem Ipsum available. </p>
-                                                            </div>
-                                                            <span class="reply"><i class="zmdi zmdi-mail-reply"></i></span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <div class="image"><img src="../assets/images/avatar/avatar-1.jpg" alt=""></div>
-                                                            <div class="content">
-                                                                <h6>Sub: Mail Support</h6>
-                                                                <p>There are many variations of passages of Lorem Ipsum available. </p>
-                                                            </div>
-                                                            <span class="reply"><i class="zmdi zmdi-mail-reply"></i></span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <div class="image"><img src="../assets/images/avatar/avatar-2.jpg" alt=""></div>
-                                                            <div class="content">
-                                                                <h6>Sub: Product inquiry</h6>
-                                                                <p>There are many variations of passages of Lorem Ipsum available. </p>
-                                                            </div>
-                                                            <span class="reply"><i class="zmdi zmdi-mail-reply"></i></span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <div class="image"><img src="../assets/images/avatar/avatar-1.jpg" alt=""></div>
-                                                            <div class="content">
-                                                                <h6>Sub: Mail Support</h6>
-                                                                <p>There are many variations of passages of Lorem Ipsum available. </p>
-                                                            </div>
-                                                            <span class="reply"><i class="zmdi zmdi-mail-reply"></i></span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-
-                                    </li>
-
-                                    <!--Notification-->
-                                    <li class="adomx-dropdown col-auto">
-                                        <a class="toggle" href="#"><i class="zmdi zmdi-notifications"></i><span class="badge"></span></a>
-
-                                        <!-- Dropdown -->
-                                        <div class="adomx-dropdown-menu dropdown-menu-notifications">
-                                            <div class="head">
-                                                <h5 class="title">You have 4 new notification.</h5>
-                                            </div>
-                                            <div class="body custom-scroll">
-                                                <ul>
-                                                    <li>
-                                                        <a href="#">
-                                                            <i class="zmdi zmdi-notifications-none"></i>
-                                                            <p>There are many variations of pages available.</p>
-                                                            <span>11.00 am Today</span>
-                                                        </a>
-                                                        <button class="delete"><i class="zmdi zmdi-close-circle-o"></i></button>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <i class="zmdi zmdi-block"></i>
-                                                            <p>There are many variations of pages available.</p>
-                                                            <span>11.00 am Today</span>
-                                                        </a>
-                                                        <button class="delete"><i class="zmdi zmdi-close-circle-o"></i></button>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <i class="zmdi zmdi-info-outline"></i>
-                                                            <p>There are many variations of pages available.</p>
-                                                            <span>11.00 am Today</span>
-                                                        </a>
-                                                        <button class="delete"><i class="zmdi zmdi-close-circle-o"></i></button>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <i class="zmdi zmdi-shield-security"></i>
-                                                            <p>There are many variations of pages available.</p>
-                                                            <span>11.00 am Today</span>
-                                                        </a>
-                                                        <button class="delete"><i class="zmdi zmdi-close-circle-o"></i></button>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <i class="zmdi zmdi-notifications-none"></i>
-                                                            <p>There are many variations of pages available.</p>
-                                                            <span>11.00 am Today</span>
-                                                        </a>
-                                                        <button class="delete"><i class="zmdi zmdi-close-circle-o"></i></button>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <i class="zmdi zmdi-block"></i>
-                                                            <p>There are many variations of pages available.</p>
-                                                            <span>11.00 am Today</span>
-                                                        </a>
-                                                        <button class="delete"><i class="zmdi zmdi-close-circle-o"></i></button>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <i class="zmdi zmdi-info-outline"></i>
-                                                            <p>There are many variations of pages available.</p>
-                                                            <span>11.00 am Today</span>
-                                                        </a>
-                                                        <button class="delete"><i class="zmdi zmdi-close-circle-o"></i></button>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <i class="zmdi zmdi-shield-security"></i>
-                                                            <p>There are many variations of pages available.</p>
-                                                            <span>11.00 am Today</span>
-                                                        </a>
-                                                        <button class="delete"><i class="zmdi zmdi-close-circle-o"></i></button>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <div class="footer">
-                                                <a href="#" class="view-all">view all</a>
-                                            </div>
-                                        </div>
-
-                                    </li>
-
-                                    <!--User-->
-                                    <li class="adomx-dropdown col-auto">
-                                        <a class="toggle" href="#">
-                                            <span class="user">
-                                                <span class="avatar">
-                                                    <img src="../assets/images/avatar/avatar-1.jpg" alt="">
-                                                    <span class="status"></span>
-                                                </span>
-                                                <span class="name">Madison Howard</span>
-                                            </span>
-                                        </a>
-
-                                        <!-- Dropdown -->
-                                        <div class="adomx-dropdown-menu dropdown-menu-user">
-                                            <div class="head">
-                                                <h5 class="name"><a href="#">Madison Howard</a></h5>
-                                                <a class="mail" href="#">mailnam@mail.com</a>
-                                            </div>
-                                            <div class="body">
-                                                <ul>
-                                                    <li><a href="#"><i class="zmdi zmdi-account"></i>Profile</a></li>
-                                                    <li><a href="#"><i class="zmdi zmdi-email-open"></i>Inbox</a></li>
-                                                    <li><a href="#"><i class="zmdi zmdi-wallpaper"></i>Activity</a></li>
-                                                </ul>
-                                                <ul>
-                                                    <li><a href="#"><i class="zmdi zmdi-settings"></i>Setting</a></li>
-                                                    <li><a href="#"><i class="zmdi zmdi-lock-open"></i>Sing out</a></li>
-                                                </ul>
-                                                <ul>
-                                                    <li><a href="#"><i class="zmdi zmdi-paypal"></i>Payment</a></li>
-                                                    <li><a href="#"><i class="zmdi zmdi-google-pages"></i>Invoice</a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-
-                                    </li>
-
-                                </ul>
-
-                            </div><!-- Header Notifications Area End -->
-
-                        </div>
-                    </div><!-- Header Right End -->
+                        <?php include '../partials/shared/top-nav.php';?>
+                    <!-- Header Right End -->
 
                 </div>
             </div>
@@ -304,30 +80,50 @@ include '../configuration/routes.php';
         <div class="side-header show">
             <button class="side-header-close"><i class="zmdi zmdi-close"></i></button>
             <!-- Side Header Inner Start -->
-            <div class="side-header-inner custom-scroll">
-
-                <nav class="side-header-menu" id="side-header-menu">
-                    <ul>
-                        <li class="has-sub-menu"><a href="#"><i class="ti-home"></i> <span>Dashboard</span></a>
-                            <ul class="side-header-sub-menu">
-                                <li><a href="index.html"><span>E-commerce (Default)</span></a></li>
-                                <li><a href="index-crypto.html"><span>Cryptocurrency</span></a></li>
-                            </ul>
-                        </li>
-
-
-                    </ul>
-                </nav>
-
-            </div><!-- Side Header Inner End -->
+             <?php include '../partials/barangayofficial/side-bar.php';?>
+            <!-- Side Header Inner End -->
         </div><!-- Side Header End -->
 
         <!-- Content Body Start -->
         <div class="content-body">
-
-        
-
-
+            <div class="container mt-5">
+                <div class="box">
+                    <div class="box-header text-white">
+                        <h4 class="mb-0">Barangay Map & Houses</h4>
+                    </div>
+                    <div class="box-body">
+                        <div class="row mb-3">
+                            <div class="col-md-4 mb-2">
+                                <select id="provinceFilter" class="form-control">
+                                    <option value="">All Provinces</option>
+                                    <?php foreach ($provinces as $prov): ?>
+                                        <option value="<?= $prov['id'] ?>"><?= htmlspecialchars($prov['province_name']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <select id="municipalityFilter" class="form-control">
+                                    <option value="">All Municipalities</option>
+                                    <?php foreach ($municipalities as $mun): ?>
+                                        <option value="<?= $mun['id'] ?>"><?= htmlspecialchars($mun['municipality']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <select id="barangayFilter" class="form-control">
+                                    <option value="">All Barangays</option>
+                                    <?php foreach ($barangays as $brgy): ?>
+                                        <option value="<?= $brgy['id'] ?>"><?= htmlspecialchars($brgy['barangay_name']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="houseMap" style="height: 500px; width: 100%; border: 1px solid #ccc;"></div>
+                    </div>
+                </div>
+            </div>
+            
+          
         </div><!-- Content Body End -->
 
         <!-- Footer Section Start -->
@@ -376,7 +172,148 @@ include '../configuration/routes.php';
     <script src="../assets/js/plugins/vmap/maps/samples/jquery.vmap.sampledata.js"></script>
     <script src="../assets/js/plugins/vmap/vmap.active.js"></script>
     <!-- Leaflet JS for Map Viewer -->
-   
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+            <script>
+                const allHouses = <?= json_encode($houses) ?>;
+                const allBarangays = <?= json_encode($barangays) ?>;
+                const allMunicipalities = <?= json_encode($municipalities) ?>;
+                const allProvinces = <?= json_encode($provinces) ?>;
+                let mapCenter = [12.8797, 121.7740];
+                let mapZoom = 6;
+                let map = L.map('houseMap').setView(mapCenter, mapZoom);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+                let boundaryLayer = null;
+                let houseMarkers = [];
+
+                function filterData() {
+                    const provinceId = document.getElementById('provinceFilter').value;
+                    const municipalityId = document.getElementById('municipalityFilter').value;
+                    const barangayId = document.getElementById('barangayFilter').value;
+
+                    // Filter barangays
+                    let filteredBarangays = allBarangays;
+                    if (provinceId) filteredBarangays = filteredBarangays.filter(b => b.province_id == provinceId);
+                    if (municipalityId) filteredBarangays = filteredBarangays.filter(b => b.municipal_id == municipalityId);
+                    if (barangayId) filteredBarangays = filteredBarangays.filter(b => b.id == barangayId);
+
+                    // Filter houses
+                    let filteredHouses = allHouses;
+                    if (barangayId) {
+                        filteredHouses = filteredHouses.filter(h => h.barangay_id == barangayId);
+                    } else if (municipalityId) {
+                        const brgyIds = filteredBarangays.map(b => b.id);
+                        filteredHouses = filteredHouses.filter(h => brgyIds.includes(Number(h.barangay_id)));
+                    } else if (provinceId) {
+                        const brgyIds = filteredBarangays.map(b => b.id);
+                        filteredHouses = filteredHouses.filter(h => brgyIds.includes(Number(h.barangay_id)));
+                    }
+
+                    return { filteredBarangays, filteredHouses, barangayId };
+                }
+
+                function updateMap() {
+                    // Remove old boundary
+                    if (boundaryLayer) {
+                        map.removeLayer(boundaryLayer);
+                        boundaryLayer = null;
+                    }
+                    // Remove old markers
+                    houseMarkers.forEach(m => map.removeLayer(m));
+                    houseMarkers = [];
+
+                    const { filteredBarangays, filteredHouses, barangayId } = filterData();
+
+                    // Draw barangay boundary if only one barangay selected
+                    let fitBounds = false;
+                    if (barangayId && filteredBarangays.length === 1 && filteredBarangays[0].geojson) {
+                        try {
+                            const geojson = JSON.parse(filteredBarangays[0].geojson);
+                            boundaryLayer = L.geoJSON(geojson, {
+                                style: { color: '#007bff', weight: 2, fillOpacity: 0.1 }
+                            }).addTo(map);
+                            fitBounds = true;
+                        } catch (e) {}
+                    }
+
+                    // Draw house markers
+                    let markerGroup = [];
+                    filteredHouses.forEach(house => {
+                        if (!house.geojson) return;
+                        let coords = null;
+                        try {
+                            const geometry = JSON.parse(house.geojson);
+                            if (geometry.type === 'Point') {
+                                coords = [geometry.coordinates[1], geometry.coordinates[0]];
+                            }
+                        } catch (e) {}
+                        if (coords) {
+                            const marker = L.marker(coords).addTo(map)
+                                .bindPopup(`<strong>House #${house.house_number}</strong><br>Street: ${house.street_name}`);
+                            houseMarkers.push(marker);
+                            markerGroup.push(marker);
+                        }
+                    });
+
+                    // Fit map
+                    if (fitBounds && boundaryLayer) {
+                        setTimeout(() => {
+                            map.fitBounds(boundaryLayer.getBounds());
+                        }, 200);
+                    } else if (markerGroup.length > 0) {
+                        const group = L.featureGroup(markerGroup);
+                        setTimeout(() => {
+                            map.fitBounds(group.getBounds(), { maxZoom: 16 });
+                        }, 200);
+                    } else {
+                        map.setView(mapCenter, mapZoom);
+                    }
+                }
+
+                // Filter dropdown logic
+                document.getElementById('provinceFilter').addEventListener('change', function() {
+                    const provinceId = this.value;
+                    // Update municipalities
+                    const munSel = document.getElementById('municipalityFilter');
+                    munSel.innerHTML = '<option value="">All Municipalities</option>';
+                    allMunicipalities.filter(m => !provinceId || m.province_id == provinceId).forEach(m => {
+                        const opt = document.createElement('option');
+                        opt.value = m.id;
+                        opt.textContent = m.municipality;
+                        munSel.appendChild(opt);
+                    });
+                    // Update barangays
+                    const brgySel = document.getElementById('barangayFilter');
+                    brgySel.innerHTML = '<option value="">All Barangays</option>';
+                    allBarangays.filter(b => !provinceId || b.province_id == provinceId).forEach(b => {
+                        const opt = document.createElement('option');
+                        opt.value = b.id;
+                        opt.textContent = b.barangay_name;
+                        brgySel.appendChild(opt);
+                    });
+                    updateMap();
+                });
+                document.getElementById('municipalityFilter').addEventListener('change', function() {
+                    const municipalityId = this.value;
+                    const provinceId = document.getElementById('provinceFilter').value;
+                    // Update barangays
+                    const brgySel = document.getElementById('barangayFilter');
+                    brgySel.innerHTML = '<option value="">All Barangays</option>';
+                    allBarangays.filter(b => (!provinceId || b.province_id == provinceId) && (!municipalityId || b.municipal_id == municipalityId)).forEach(b => {
+                        const opt = document.createElement('option');
+                        opt.value = b.id;
+                        opt.textContent = b.barangay_name;
+                        brgySel.appendChild(opt);
+                    });
+                    updateMap();
+                });
+                document.getElementById('barangayFilter').addEventListener('change', function() {
+                    updateMap();
+                });
+                // Initial map render
+                updateMap();
+            </script>
 
 </body>
 
