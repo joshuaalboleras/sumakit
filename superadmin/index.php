@@ -367,7 +367,7 @@ $houses = $conn->query("SELECT * FROM houses")->fetchAll(PDO::FETCH_ASSOC);
                     <h1>Welcome Super Admin</h1>
                     <p>Search and explore saved municipalities on the map below.</p>
                     <div class="filters" style="display: flex; gap: 10px; margin-bottom: 10px;">
-                        <input type="text" id="search" placeholder="Search municipality name..." class="form-control" />
+                        <input type="text" id="search" placeholder="Search municipality / city" class="form-control" />
                         <select id="provinceFilter" class="form-control">
                             <option value="">All Provinces</option>
                             <?php foreach (

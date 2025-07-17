@@ -102,11 +102,11 @@ include '../configuration/routes.php';
                 </div>
               </div>
               <div class="mb-3">
-                <label for="municipal_id" class="form-label">Municipality</label>
+                <label for="municipal_id" class="form-label">Municipality / City</label>
                 <div class="input-group">
                   <span class="input-group-text"><i class="fa fa-landmark"></i></span>
                   <select name="municipal_id" id="municipal_id" class="form-control bg-light text-dark" required disabled>
-                    <option value="">Select Municipality</option>
+                    <option value="">Select Municipality / City</option>
                   </select>
                 </div>
               </div>

@@ -170,10 +170,10 @@ include '../configuration/routes.php';
                       </div>
                     </div>
                     <div class="mb-3">
-                      <label for="municipality" class="form-label">Municipality</label>
+                      <label for="municipality" class="form-label">Municipality / City</label>
                       <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-landmark"></i></span>
-                        <input type="text" name="municipality" placeholder="Enter Municipality" required class="form-control">
+                        <input type="text" name="municipality" placeholder="Enter Municipality / City" required class="form-control">
                       </div>
                     </div>
                     <input type="hidden" name="geojson" id="geojson">
@@ -221,11 +221,11 @@ include '../configuration/routes.php';
                       </div>
                     </div>
                     <div class="mb-3">
-                      <label for="municipal_id_barangay" class="form-label">Municipality</label>
+                      <label for="municipal_id_barangay" class="form-label">Municipality / City</label>
                       <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-landmark"></i></span>
                         <select name="municipal_id" id="municipal_id_barangay" class="form-control" required disabled>
-                          <option value="">Select Municipality</option>
+                          <option value="">Select Municipality / City</option>
                         </select>
                       </div>
                     </div>

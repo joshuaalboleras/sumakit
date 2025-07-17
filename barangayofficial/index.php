@@ -95,26 +95,20 @@ $houses = $conn->query("SELECT * FROM houses")->fetchAll(PDO::FETCH_ASSOC);
                         <div class="row mb-3">
                             <div class="col-md-4 mb-2">
                                 <select id="provinceFilter" class="form-control">
-                                    <option value="">All Provinces</option>
+                                    <option value="">Select Province</option>
                                     <?php foreach ($provinces as $prov): ?>
                                         <option value="<?= $prov['id'] ?>"><?= htmlspecialchars($prov['province_name']) ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
                             <div class="col-md-4 mb-2">
-                                <select id="municipalityFilter" class="form-control">
-                                    <option value="">All Municipalities</option>
-                                    <?php foreach ($municipalities as $mun): ?>
-                                        <option value="<?= $mun['id'] ?>"><?= htmlspecialchars($mun['municipality']) ?></option>
-                                    <?php endforeach; ?>
+                                <select id="municipalityFilter" class="form-control" disabled>
+                                    <option value="">Select Municipality / City</option>
                                 </select>
                             </div>
                             <div class="col-md-4 mb-2">
-                                <select id="barangayFilter" class="form-control">
-                                    <option value="">All Barangays</option>
-                                    <?php foreach ($barangays as $brgy): ?>
-                                        <option value="<?= $brgy['id'] ?>"><?= htmlspecialchars($brgy['barangay_name']) ?></option>
-                                    <?php endforeach; ?>
+                                <select id="barangayFilter" class="form-control" disabled>
+                                    <option value="">Select Barangay</option>
                                 </select>
                             </div>
                         </div>
@@ -278,45 +272,52 @@ $houses = $conn->query("SELECT * FROM houses")->fetchAll(PDO::FETCH_ASSOC);
                     }
                 }
 
-                // Filter dropdown logic
-                document.getElementById('provinceFilter').addEventListener('change', function() {
-                    const provinceId = this.value;
-                    // Update municipalities
-                    const munSel = document.getElementById('municipalityFilter');
-                    munSel.innerHTML = '<option value="">All Municipalities</option>';
-                    allMunicipalities.filter(m => !provinceId || m.province_id == provinceId).forEach(m => {
-                        const opt = document.createElement('option');
-                        opt.value = m.id;
-                        opt.textContent = m.municipality;
-                        munSel.appendChild(opt);
+                $(document).ready(function() {
+                    // When province changes, fetch municipalities
+                    $('#provinceFilter').on('change', function() {
+                        var provinceId = $(this).val();
+                        $('#municipalityFilter').prop('disabled', true).html('<option value="">Select Municipality</option>');
+                        $('#barangayFilter').prop('disabled', true).html('<option value="">Select Barangay</option>');
+                        if (provinceId) {
+                            $.get('/handler/barangayofficial/get_municipalities.php', { province_id: provinceId }, function(data) {
+                                var options = '<option value="">Select Municipality</option>';
+                                if (Array.isArray(data) && data.length > 0) {
+                                    data.forEach(function(m) {
+                                        options += '<option value="' + m.id + '">' + m.municipality + '</option>';
+                                    });
+                                    $('#municipalityFilter').html(options).prop('disabled', false);
+                                } else {
+                                    options += '<option value="" disabled>No municipalities found</option>';
+                                    $('#municipalityFilter').html(options).prop('disabled', false);
+                                }
+                            }, 'json');
+                        }
+                        updateMap();
                     });
-                    // Update barangays
-                    const brgySel = document.getElementById('barangayFilter');
-                    brgySel.innerHTML = '<option value="">All Barangays</option>';
-                    allBarangays.filter(b => !provinceId || b.province_id == provinceId).forEach(b => {
-                        const opt = document.createElement('option');
-                        opt.value = b.id;
-                        opt.textContent = b.barangay_name;
-                        brgySel.appendChild(opt);
+                    // When municipality changes, fetch barangays
+                    $('#municipalityFilter').on('change', function() {
+                        var municipalId = $(this).val();
+                        $('#barangayFilter').prop('disabled', true).html('<option value="">Select Barangay</option>');
+                        if (municipalId) {
+                            $.get('/handler/barangayofficial/get_barangays.php', { municipal_id: municipalId }, function(data) {
+                                var options = '<option value="">Select Barangay</option>';
+                                if (Array.isArray(data) && data.length > 0) {
+                                    data.forEach(function(b) {
+                                        options += '<option value="' + b.id + '">' + b.barangay_name + '</option>';
+                                    });
+                                    $('#barangayFilter').html(options).prop('disabled', false);
+                                } else {
+                                    options += '<option value="" disabled>No barangays found</option>';
+                                    $('#barangayFilter').html(options).prop('disabled', false);
+                                }
+                            }, 'json');
+                        }
+                        updateMap();
                     });
-                    updateMap();
-                });
-                document.getElementById('municipalityFilter').addEventListener('change', function() {
-                    const municipalityId = this.value;
-                    const provinceId = document.getElementById('provinceFilter').value;
-                    // Update barangays
-                    const brgySel = document.getElementById('barangayFilter');
-                    brgySel.innerHTML = '<option value="">All Barangays</option>';
-                    allBarangays.filter(b => (!provinceId || b.province_id == provinceId) && (!municipalityId || b.municipal_id == municipalityId)).forEach(b => {
-                        const opt = document.createElement('option');
-                        opt.value = b.id;
-                        opt.textContent = b.barangay_name;
-                        brgySel.appendChild(opt);
+                    // When barangay changes, just update the map
+                    $('#barangayFilter').on('change', function() {
+                        updateMap();
                     });
-                    updateMap();
-                });
-                document.getElementById('barangayFilter').addEventListener('change', function() {
-                    updateMap();
                 });
                 // Initial map render
                 updateMap();

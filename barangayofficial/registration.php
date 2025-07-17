@@ -142,9 +142,9 @@ $provinces = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="municipal_id">Municipality</label>
+                                        <label for="municipal_id">Municipality /City</label>
                                         <select class="form-control" id="municipal_id" name="municipal_id" required disabled>
-                                            <option value="">Select Municipality</option>
+                                            <option value="">Select Municipality / City</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
@@ -177,46 +177,6 @@ $provinces = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <link rel="stylesheet" href="https://unpkg.com/leaflet-draw/dist/leaflet.draw.css" />
             <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
             <script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script>
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    var map = L.map('map').setView([12.8797, 121.7740], 6); // Default to Philippines
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        maxZoom: 19,
-                        attribution: '© OpenStreetMap'
-                    }).addTo(map);
-
-                    var drawnItems = new L.FeatureGroup();
-                    map.addLayer(drawnItems);
-
-                    var drawControl = new L.Control.Draw({
-                        draw: {
-                            polygon: false,
-                            polyline: false,
-                            rectangle: false,
-                            circle: false,
-                            circlemarker: false,
-                            marker: true
-                        },
-                        edit: {
-                            featureGroup: drawnItems,
-                            remove: true
-                        }
-                    });
-                    map.addControl(drawControl);
-
-                    map.on(L.Draw.Event.CREATED, function (e) {
-                        drawnItems.clearLayers(); // Only one marker at a time
-                        var layer = e.layer;
-                        drawnItems.addLayer(layer);
-                        var geojson = layer.toGeoJSON();
-                        document.getElementById('geojson').value = JSON.stringify(geojson.geometry);
-                    });
-
-                    map.on('draw:deleted', function () {
-                        document.getElementById('geojson').value = '';
-                    });
-                });
-            </script>
 
 
         </div><!-- Content Body End -->
@@ -300,7 +260,9 @@ $provinces = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     var options = '<option value="">Select Barangay</option>';
                     if (Array.isArray(data) && data.length > 0) {
                         data.forEach(function(b) {
-                            options += '<option value="' + b.id + '">' + b.barangay_name + '</option>';
+                            console.log('Barangay data:', b);
+                            var geojsonData = b.geojson || '';
+                            options += '<option value="' + b.id + '" data-geojson="' + encodeURIComponent(geojsonData) + '">' + b.barangay_name + '</option>';
                         });
                         $('#barangay_id').html(options).prop('disabled', false);
                     } else {
@@ -308,6 +270,90 @@ $provinces = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         $('#barangay_id').html(options).prop('disabled', false);
                     }
                 }, 'json');
+            }
+        });
+
+        // --- MAP BOUNDARY DRAWING ---
+        var map, drawnItems, drawControl, boundaryLayer;
+        function initMap() {
+            map = L.map('map').setView([12.8797, 121.7740], 6); // Default to Philippines
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            drawnItems = new L.FeatureGroup();
+            map.addLayer(drawnItems);
+
+            drawControl = new L.Control.Draw({
+                draw: {
+                    polygon: false,
+                    polyline: false,
+                    rectangle: false,
+                    circle: false,
+                    circlemarker: false,
+                    marker: true
+                },
+                edit: {
+                    featureGroup: drawnItems,
+                    remove: true
+                }
+            });
+            map.addControl(drawControl);
+
+            map.on(L.Draw.Event.CREATED, function (e) {
+                drawnItems.clearLayers(); // Only one marker at a time
+                var layer = e.layer;
+                drawnItems.addLayer(layer);
+                var geojson = layer.toGeoJSON();
+                document.getElementById('geojson').value = JSON.stringify(geojson.geometry);
+            });
+
+            map.on('draw:deleted', function () {
+                document.getElementById('geojson').value = '';
+            });
+        }
+        // Initialize map after DOM ready
+        initMap();
+
+        // Draw barangay boundary when barangay is selected
+        $('#barangay_id').on('change', function() {
+            var selected = $(this).find('option:selected');
+            var geojsonStr = selected.data('geojson');
+            console.log('Selected barangay:', selected.text());
+            console.log('GeoJSON string:', geojsonStr);
+            
+            if (boundaryLayer) {
+                map.removeLayer(boundaryLayer);
+                boundaryLayer = null;
+            }
+            
+            if (geojsonStr) {
+                try {
+                    var geojson = JSON.parse(decodeURIComponent(geojsonStr));
+                    console.log('Parsed GeoJSON:', geojson);
+                    
+                    boundaryLayer = L.geoJSON(geojson, {
+                        style: { color: 'red', weight: 2, fillOpacity: 0.1 }
+                    }).addTo(map);
+                    
+                    // Fit map to boundary
+                    var bounds = boundaryLayer.getBounds();
+                    console.log('Boundary bounds:', bounds);
+                    
+                    // Add a small delay to ensure the layer is properly added
+                    setTimeout(function() {
+                        map.fitBounds(bounds);
+                    }, 100);
+                    
+                } catch (e) {
+                    console.error('Error parsing GeoJSON:', e);
+                    console.error('GeoJSON string was:', geojsonStr);
+                }
+            } else {
+                console.log('No GeoJSON data found for selected barangay');
+                // Reset map to default view if no boundary data
+                map.setView([12.8797, 121.7740], 6);
             }
         });
     });

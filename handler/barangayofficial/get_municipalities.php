@@ -7,7 +7,7 @@ if (!isset($_GET['province_id']) || !is_numeric($_GET['province_id'])) {
     exit;
 }
 $province_id = (int)$_GET['province_id'];
-$stmt = $conn->prepare('SELECT id, municipality FROM municipalities WHERE province_id = ? ORDER BY municipality ASC');
+$stmt = $conn->prepare('SELECT id, municipality,geojson FROM municipalities WHERE province_id = ? ORDER BY municipality ASC');
 $stmt->execute([$province_id]);
 $municipalities = $stmt->fetchAll(PDO::FETCH_ASSOC);
 echo json_encode($municipalities); 
