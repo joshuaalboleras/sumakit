@@ -137,7 +137,7 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <td><?= htmlspecialchars($row['status'] ?? '') ?></td>
                                 <td><?= htmlspecialchars($row['no_floors'] ?? '') ?></td>
                                 <td><?= htmlspecialchars($row['year_built'] ?? '') ?></td>
-                                <td><textarea readonly style="width:100px; height:40px; font-size:10px;"><?= htmlspecialchars($row['geojson'] ?? '') ?></textarea></td>
+                                <td><a href="../view_location.php?id=<?= $row['id'] ?>" target="_blank" class="btn btn-info btn-sm">View Location</a></td>
                                 <td>
                                     <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editModal<?= $row['id'] ?>">Edit</button>
                                     <form method="post" action="" style="display:inline;" onsubmit="return confirm('Delete this house?');">

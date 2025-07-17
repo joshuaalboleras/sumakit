@@ -8,11 +8,13 @@ $redirect = strtolower($_SESSION['user']['redirect_to'] ?? '../index.php');
 $superadmin = [
     'superadmin/index.php',
     'superadmin/registration.php',
+    'superadmin/register-household.php',
     'superadmin/main.php',
     'superadmin/management.php',
     'superadmin/manage-houses.php',
     'superadmin/manage-households.php',
     'superadmin/manage-stores.php',
+    'superadmin/store-registration.php',
 
 ];
 

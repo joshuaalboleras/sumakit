@@ -38,7 +38,7 @@ if (isset($_POST['edit_municipality_id'])) {
 }
 // Fetch provinces
 $provinces = $conn->query("SELECT * FROM provinces ORDER BY province_name ASC")->fetchAll(PDO::FETCH_ASSOC);
-// Fetch municipalities (with province name)
+// Fetch municipalities (with province name and geojson)
 $stmt = $conn->query("SELECT m.*, p.province_name FROM municipalities m JOIN provinces p ON m.province_id = p.id ORDER BY m.municipality ASC");
 $municipalities = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -170,6 +170,7 @@ $municipalities = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <td><?= htmlspecialchars($row['province_name'] ?? '') ?></td>
                                 <td><?= htmlspecialchars($row['date_added'] ?? '') ?></td>
                                 <td>
+                                    <a href="../view_location.php?id=<?= $row['id'] ?>&type=municipality" target="_blank" class="btn btn-info btn-sm mb-1">View Location</a>
                                     <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editMunicipalityModal<?= $row['id'] ?>">Edit</button>
                                     <form method="post" action="" style="display:inline;" onsubmit="return confirm('Delete this municipality?');">
                                         <input type="hidden" name="delete_municipality_id" value="<?= $row['id'] ?>">

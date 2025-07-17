@@ -115,7 +115,7 @@ $provinces = $conn->query("SELECT id, province_name FROM provinces ORDER BY prov
                                 <td><?= $row['province_id'] ?></td>
                                 <td><?= $row['municipal_id'] ?></td>
                                 <td><?= $row['barangay_id'] ?></td>
-                                <td><textarea readonly style="width:100px; height:40px; font-size:10px;"><?= htmlspecialchars($row['geojson']) ?></textarea></td>
+                                <td><a href="../view_location.php?id=<?= $row['id'] ?>&type=store" target="_blank" class="btn btn-info btn-sm">View Location</a></td>
                                 <td>
                                     <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editModal<?= $row['id'] ?>">Edit</button>
                                     <form method="post" action="" style="display:inline;" onsubmit="return confirm('Delete this store?');">

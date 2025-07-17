@@ -1,1 +1,0 @@
- @c:\Users\Joshua Alboleras\Downloads\stores (1).sql okay lets make some modification to the store registration form, since i have added a new column called household id however it's nullable. I basically want to add a new feature to the cascading logic , when  after choosing a specific barangay i should be able to choose  a family_name based on 
