@@ -250,6 +250,32 @@ $municipalities = $conn->query("SELECT * FROM municipalities")->fetchAll(PDO::FE
                 municipality: this.value,
                 search: document.getElementById('barangaySearch').value
             });
+
+            // Pan/zoom to municipality bounds
+            const selectedMunicipality = this.value;
+            if (selectedMunicipality) {
+                // Collect bounds of all barangays in this municipality
+                let bounds = null;
+                barangays.forEach(b => {
+                    if (b.municipality === selectedMunicipality && b.geojson && b.geojson.trim() !== "") {
+                        try {
+                            const geojson = JSON.parse(b.geojson);
+                            const layer = L.geoJSON(geojson);
+                            const layerBounds = layer.getBounds();
+                            if (layerBounds.isValid()) {
+                                if (!bounds) {
+                                    bounds = layerBounds;
+                                } else {
+                                    bounds.extend(layerBounds);
+                                }
+                            }
+                        } catch (e) {}
+                    }
+                });
+                if (bounds && bounds.isValid()) {
+                    barangayMap.fitBounds(bounds, { maxZoom: 14 });
+                }
+            }
         });
 
         document.getElementById('barangaySearch').addEventListener('input', function() {
