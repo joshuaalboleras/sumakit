@@ -8,6 +8,7 @@
                      <ul class="side-header-sub-menu">
                          <li><a href="index.php"><span>Main</span></a></li>
                          <li><a href="registration.php"><span>Registration</span></a></li>
+                         <li><a href="manage-barangays.php"><span>Manage Barangays</span></a></li>
                      </ul>
                  </li>
              </ul>

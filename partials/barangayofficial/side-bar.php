@@ -11,6 +11,13 @@
                          <li><a href="store-registration.php"><span>Store Registraion</span></a></li>
                      </ul>
                  </li>
+                 <li class="has-sub-menu"><a href="management.php"><i class="ti-home"></i> <span>Management</span></a>
+                     <ul class="side-header-sub-menu">
+                         <li><a href="manage-stores.php"><span>Stores</span></a></li>
+                         <li><a href="manage-households.php"><span>Households</span></a></li>
+                         <li><a href="manage-houses.php"><span>Houses</span></a></li>
+                     </ul>
+                 </li>
              </ul>
          </nav>
      </div>

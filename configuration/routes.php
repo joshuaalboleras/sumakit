@@ -9,12 +9,17 @@ $superadmin = [
     'superadmin/index.php',
     'superadmin/registration.php',
     'superadmin/main.php',
+    'superadmin/management.php',
+    'superadmin/manage-houses.php',
+    'superadmin/manage-households.php',
+    'superadmin/manage-stores.php',
 
 ];
 
 $municipal_official = [
     'municipalofficial/index.php',
     'municipalofficial/registration.php',
+    'municipalofficial/manage-barangays.php',
 ];
 
 $barangay_official = [
@@ -22,6 +27,9 @@ $barangay_official = [
     'barangayofficial/index.php',
     'barangayofficial/registration.php',
     'barangayofficial/store-registration.php',
+    'barangayofficial/manage-houses.php',
+    'barangayofficial/manage-households.php',
+    'barangayofficial/manage-stores.php',
 ];
 
 $visitor = [

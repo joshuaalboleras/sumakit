@@ -101,7 +101,7 @@ $houses = $conn->query("SELECT * FROM houses")->fetchAll(PDO::FETCH_ASSOC);
         <div class="side-header show">
             <button class="side-header-close"><i class="zmdi zmdi-close"></i></button>
             <!-- Side Header Inner Start -->
-            <?php include '../partials/superadmin/nav.php' ?>
+            <?php include '../partials/superadmin/side-bar.php' ?>
             <!-- Side Header Inner End -->
         </div>
 
