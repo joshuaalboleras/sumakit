@@ -118,6 +118,19 @@ include '../configuration/routes.php';
                                             <option value="">Select Barangay</option>
                                         </select>
                                     </div>
+                                    <div class="form-group" id="family_name_group" style="display:none;">
+                                        <label for="family_name">Family Name</label>
+                                        <select class="form-control" id="family_name" name="family_name">
+                                            <option value="">Select Family Name</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" id="owner_candidate_group" style="display:none;">
+                                        <label for="owner_candidate">Recommend Owner</label>
+                                        <select class="form-control" id="owner_candidate" name="owner_candidate">
+                                            <option value="">Select Owner</option>
+                                        </select>
+                                    </div>
+                                    <input type="hidden" id="household_id" name="household_id" />
                                 </div>
                                 <!-- Right column: map and geojson -->
                                 <div class="col-12 col-md-6">
@@ -147,6 +160,9 @@ include '../configuration/routes.php';
                         var provinceId = $(this).val();
                         $('#municipal_id').prop('disabled', true).html('<option value="">Select Municipality</option>');
                         $('#barangay_id').prop('disabled', true).html('<option value="">Select Barangay</option>');
+                        $('#family_name_group').hide();
+                        $('#owner_candidate_group').hide();
+                        $('#household_id').val('');
                         if (provinceId) {
                             $.get('/handler/barangayofficial/get_municipalities.php', {
                                 province_id: provinceId
@@ -168,6 +184,9 @@ include '../configuration/routes.php';
                     $('#municipal_id').on('change', function() {
                         var municipalId = $(this).val();
                         $('#barangay_id').prop('disabled', true).html('<option value="">Select Barangay</option>');
+                        $('#family_name_group').hide();
+                        $('#owner_candidate_group').hide();
+                        $('#household_id').val('');
                         if (municipalId) {
                             $.get('/handler/barangayofficial/get_barangays.php', {
                                 municipal_id: municipalId
@@ -185,6 +204,68 @@ include '../configuration/routes.php';
                                 }
                             }, 'json');
                         }
+                    });
+                    // When barangay changes, fetch family names
+                    $('#barangay_id').on('change', function() {
+                        var barangayId = $(this).val();
+                        $('#family_name').html('<option value="">Select Family Name</option>');
+                        $('#owner_candidate').html('<option value="">Select Owner</option>');
+                        $('#family_name_group').hide();
+                        $('#owner_candidate_group').hide();
+                        $('#household_id').val('');
+                        if (barangayId) {
+                            // Fetch family names for this barangay
+                            $.get('/handler/barangayofficial/get_family_names.php', {
+                                barangay_id: barangayId
+                            }, function(data) {
+                                var options = '<option value="">Select Family Name</option>';
+                                if (Array.isArray(data) && data.length > 0) {
+                                    data.forEach(function(f) {
+                                        options += '<option value="' + f.household_id + '">' + f.family_name + '</option>';
+                                    });
+                                    $('#family_name').html(options);
+                                    $('#family_name_group').show();
+                                } else {
+                                    options += '<option value="" disabled>No family names found</option>';
+                                    $('#family_name').html(options);
+                                    $('#family_name_group').show();
+                                }
+                            }, 'json');
+                        }
+                    });
+                    // When family name changes, fetch owner candidates
+                    $('#family_name').on('change', function() {
+                        var householdId = $(this).val();
+                        $('#owner_candidate').html('<option value="">Select Owner</option>');
+                        $('#owner_candidate_group').hide();
+                        $('#household_id').val('');
+                        if (householdId) {
+                            // Fetch household members for this household
+                            $.get('/handler/barangayofficial/get_household_members.php', {
+                                household_id: householdId
+                            }, function(data) {
+                                var options = '<option value="">Select Owner</option>';
+                                if (Array.isArray(data) && data.length > 0) {
+                                    data.forEach(function(m) {
+                                        options += '<option value="' + m.id + '" data-name="' + m.name + '">' + m.name + (m.suffix ? (' ' + m.suffix) : '') + '</option>';
+                                    });
+                                    $('#owner_candidate').html(options);
+                                    $('#owner_candidate_group').show();
+                                } else {
+                                    options += '<option value="" disabled>No members found</option>';
+                                    $('#owner_candidate').html(options);
+                                    $('#owner_candidate_group').show();
+                                }
+                            }, 'json');
+                        }
+                    });
+                    // When owner candidate is selected, autofill owner_name and set household_id
+                    $('#owner_candidate').on('change', function() {
+                        var selected = $(this).find('option:selected');
+                        var name = selected.data('name') || '';
+                        var householdId = $('#family_name').val();
+                        $('#owner_name').val(name);
+                        $('#household_id').val(householdId);
                     });
                     // --- MAP BOUNDARY DRAWING ---
                     var map, drawnItems, drawControl, boundaryLayer;
