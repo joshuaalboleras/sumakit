@@ -13,6 +13,7 @@ if (isset($_POST['delete_id'])) {
 
 // Fetch provinces for dropdown
 $provinces = $conn->query("SELECT id, province_name FROM provinces ORDER BY province_name ASC")->fetchAll(PDO::FETCH_ASSOC);
+
 // Fetch all houses with location info
 // It's generally better to select specific columns instead of h.* for clarity and performance
 $stmt = $conn->query("SELECT h.id, h.house_number, h.street_name, h.building_type, h.status, h.no_floors, h.year_built, h.geojson, h.province_id, h.municipal_id, h.barangay_id, b.barangay_name, m.municipality, p.province_name FROM houses h JOIN barangays b ON h.barangay_id = b.id JOIN municipalities m ON h.municipal_id = m.id JOIN provinces p ON h.province_id = p.id");
@@ -27,7 +28,7 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="robots" content="noindex, follow" />
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="shortcut icon" type="image/x-icon" href="../assets/images/favicon.ico">
+    <link rel="shortcut icon" type="image/x-xicon" href="../assets/images/favicon.ico">
     <link rel="stylesheet" href="../assets/css/vendor/bootstrap.min.css">
     <link rel="stylesheet" href="../assets/css/vendor/material-design-iconic-font.min.css">
     <link rel="stylesheet" href="../assets/css/vendor/font-awesome.min.css">
@@ -140,7 +141,7 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?= htmlspecialchars($row['status'] ?? '') ?></td>
                                     <td><?= htmlspecialchars($row['no_floors'] ?? '') ?></td>
                                     <td><?= htmlspecialchars($row['year_built'] ?? '') ?></td>
-                                    <td><a href="../view_location.php?id=<?= $row['id'] ?>" target="_blank" class="btn btn-info btn-sm">View Location</a></td>
+                                    <td><a href="../view_location.php?id=<?= $row['id'] ?>&type=house" target="_blank" class="btn btn-info btn-sm">View Location</a></td>
                                     <td>
                                         <button class="btn btn-sm btn-primary edit-house-btn" type="button">Edit</button>
                                         <form method="post" action="" style="display:inline;" onsubmit="return confirm('Delete this house?');">
@@ -164,6 +165,84 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="editHouseModal" tabindex="-1" role="dialog" aria-labelledby="editHouseModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <form id="editHouseForm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editHouseModalLabel">Edit House</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="edit_id" name="edit_id">
+                        <div class="form-group">
+                            <label for="edit_house_number">House Number</label>
+                            <input type="text" class="form-control" id="edit_house_number" name="house_number" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_province_id">Province</label>
+                            <select class="form-control" id="edit_province_id" name="province_id" required>
+                                <option value="">Select Province</option>
+                                <?php foreach ($provinces as $prov): ?>
+                                    <option value="<?= $prov['id'] ?>"><?= htmlspecialchars($prov['province_name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_municipal_id">Municipality</label>
+                            <select class="form-control" id="edit_municipal_id" name="municipal_id" required>
+                                <option value="">Select Municipality</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_barangay_id">Barangay</label>
+                            <select class="form-control" id="edit_barangay_id" name="barangay_id" required>
+                                <option value="">Select Barangay</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_street_name">Street Name</label>
+                            <input type="text" class="form-control" id="edit_street_name" name="street_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_building_type">Building Type</label>
+                            <input type="text" class="form-control" id="edit_building_type" name="building_type">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_status">Status</label>
+                            <input type="text" class="form-control" id="edit_status" name="status">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_no_floors">Number of Floors</label>
+                            <input type="number" class="form-control" id="edit_no_floors" name="no_floors" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_year_built">Year Built</label>
+                            <input type="date" class="form-control" id="edit_year_built" name="year_built" min="1900" max="<?= date('Y') ?>">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_map">Select Location on Map</label>
+                            <div id="edit_map" style="height: 350px; width: 100%; margin-bottom: 10px;"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_geojson">GeoJSON</label>
+                            <textarea class="form-control" id="edit_geojson" name="geojson" rows="3" required></textarea>
+                        </div>
+                        <div id="editHouseMsg"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
     <script src="../assets/js/vendor/modernizr-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="../assets/js/vendor/popper.min.js"></script>
@@ -176,17 +255,23 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <script>
         var editMap, editDrawnItems, editDrawControl;
-        var barangaysData = {}; // Object to store barangay GeoJSON data
+        var barangaysData = {}; // Object to store barangay GeoJSON data {id: geojson_string}
+        var barangayBoundaryLayer; // To hold the current barangay boundary layer
 
-        function initEditMap(houseGeojsonObj, barangayGeojsonStr = null) { // Changed parameter name to reflect it's an object
-            // Remove existing map if it exists to prevent multiple maps
+        /**
+         * Initializes or re-initializes the Leaflet map in the edit modal.
+         * @param {object | null} houseGeojsonObj - The GeoJSON object for the house marker.
+         * @param {string | null} barangayGeojsonStr - The GeoJSON string for the barangay boundary.
+         */
+        function initEditMap(houseGeojsonObj, barangayGeojsonStr = null) {
+            // Remove existing map if it exists
             if (editMap) {
                 editMap.remove();
                 editMap = null;
             }
 
             // Initialize map with a default view (e.g., Philippines)
-            editMap = L.map('edit_map').setView([12.8797, 121.7740], 6);
+            editMap = L.map('edit_map').setView([12.8797, 121.7740], 6); // Centered on the Philippines
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '© OpenStreetMap'
@@ -211,54 +296,88 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
             });
             editMap.addControl(editDrawControl);
 
-            // Clear existing drawn items before adding new one
+            // Clear existing drawn items (like previous house marker)
             editDrawnItems.clearLayers();
 
-            // 1. First, try to fit to barangay GeoJSON if provided
+            // Remove previous barangay boundary if it exists
+            if (barangayBoundaryLayer) {
+                editMap.removeLayer(barangayBoundaryLayer);
+                barangayBoundaryLayer = null;
+            }
+
+            let mapZoomedToBoundary = false;
+
+            // 1. Draw and fit to barangay GeoJSON if provided
             if (barangayGeojsonStr) {
                 try {
                     var barangayGeojson = JSON.parse(barangayGeojsonStr);
-                    // Check if it's a valid GeoJSON object with coordinates
-                    if (barangayGeojson && barangayGeojson.type && barangayGeojson.coordinates) {
-                        var geoJsonLayer = L.geoJSON(barangayGeojson);
-                        if (geoJsonLayer.getBounds().isValid()) {
-                            editMap.fitBounds(geoJsonLayer.getBounds());
+                    // Corrected check: Ensure it's a Feature and has a geometry with coordinates
+                    if (barangayGeojson && barangayGeojson.type === "Feature" &&
+                        barangayGeojson.geometry && barangayGeojson.geometry.coordinates) {
+
+                        barangayBoundaryLayer = L.geoJSON(barangayGeojson, {
+                            style: function(feature) {
+                                return {
+                                    color: '#ff7800', // Orange color for boundary
+                                    weight: 3,
+                                    opacity: 0.65,
+                                    fillOpacity: 0.1
+                                };
+                            }
+                        }).addTo(editMap);
+
+                        if (barangayBoundaryLayer.getBounds().isValid()) {
+                            editMap.fitBounds(barangayBoundaryLayer.getBounds(), { padding: [50, 50] });
+                            mapZoomedToBoundary = true;
                         } else {
-                             console.warn('Barangay GeoJSON bounds are invalid or empty:', barangayGeojson);
+                            console.warn('Barangay GeoJSON bounds are invalid or empty for feature:', barangayGeojson);
+                        }
+                    } else if (barangayGeojson && barangayGeojson.type && barangayGeojson.coordinates) {
+                        // This else if handles direct Geometry Objects (e.g., {"type":"Polygon","coordinates":...})
+                        // This might be the case if 'geojson' field in the 'barangays' table directly stores geometry, not a full Feature.
+                        barangayBoundaryLayer = L.geoJSON(barangayGeojson, {
+                            style: function(feature) {
+                                return {
+                                    color: '#ff7800',
+                                    weight: 3,
+                                    opacity: 0.65,
+                                    fillOpacity: 0.1
+                                };
+                            }
+                        }).addTo(editMap);
+
+                        if (barangayBoundaryLayer.getBounds().isValid()) {
+                            editMap.fitBounds(barangayBoundaryLayer.getBounds(), { padding: [50, 50] });
+                            mapZoomedToBoundary = true;
+                        } else {
+                            console.warn('Barangay GeoJSON bounds are invalid or empty for geometry:', barangayGeojson);
                         }
                     } else {
-                        console.warn('Invalid barangay GeoJSON structure:', barangayGeojson);
+                        console.warn('Invalid barangay GeoJSON structure (neither Feature nor valid Geometry):', barangayGeojson);
                     }
                 } catch (e) {
                     console.error('Barangay GeoJSON parse error:', e, barangayGeojsonStr);
                 }
             }
 
-            // 2. Then, add the house marker and adjust view if it's there
-            // houseGeojsonObj is already an object, no need to parse it
+            // 2. Add the house marker (if it exists)
             if (houseGeojsonObj && houseGeojsonObj.type && houseGeojsonObj.coordinates) {
                 try {
                     var marker = L.geoJSON(houseGeojsonObj).getLayers()[0];
                     if (marker) {
                         editDrawnItems.addLayer(marker);
-                        // If a barangay GeoJSON was provided and successfully used for zooming,
-                        // we don't need to re-center on the house marker unless the barangay geojson was empty/invalid.
-                        // However, if the barangay geojson was not used to fitbounds (e.g., it was invalid or null),
-                        // then we should make sure the house marker is visible.
-                        if (!barangayGeojsonStr || !L.geoJSON(JSON.parse(barangayGeojsonStr)).getBounds().isValid()) {
-                            if (marker.getLatLng) {
-                                editMap.setView(marker.getLatLng(), 16); // Center map on marker with zoom
-                            }
+                        // If map wasn't already zoomed to a boundary, zoom to marker
+                        if (!mapZoomedToBoundary && marker.getLatLng) {
+                            editMap.setView(marker.getLatLng(), 16); // Center map on marker with zoom
                         }
                     }
                 } catch (e) {
                     console.error('House GeoJSON processing error:', e, houseGeojsonObj);
-                    $('#edit_geojson').val('');
+                    $('#edit_geojson').val(''); // Clear invalid GeoJSON from textarea
                 }
             }
 
-
-            // Event listener for when a new shape is created
+            // Event listener for when a new shape is created (marker in this case)
             editMap.on(L.Draw.Event.CREATED, function(e) {
                 editDrawnItems.clearLayers(); // Clear previous layers to ensure only one marker
                 var layer = e.layer;
@@ -284,7 +403,7 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         $(document).ready(function() {
-            // Province -> Municipality (existing code)
+            // Province -> Municipality for filters
             $('#provinceFilter').on('change', function() {
                 var provinceId = $(this).val();
                 $('#municipalityFilter').prop('disabled', true).html('<option value="">Select Municipality</option>');
@@ -308,7 +427,7 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 filterHouseTable();
             });
 
-            // Municipality -> Barangay (existing code)
+            // Municipality -> Barangay for filters
             $('#municipalityFilter').on('change', function() {
                 var municipalId = $(this).val();
                 $('#barangayFilter').prop('disabled', true).html('<option value="">Select Barangay</option>');
@@ -317,11 +436,10 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         municipal_id: municipalId
                     }, function(data) {
                         var options = '<option value="">Select Barangay</option>';
-                        barangaysData = {}; // Clear previous barangays data
+                        // Do not store barangaysData for filter dropdowns here, only for modal
                         if (Array.isArray(data) && data.length > 0) {
                             data.forEach(function(b) {
                                 options += '<option value="' + b.id + '">' + b.barangay_name + '</option>';
-                                barangaysData[b.id] = b.geojson; // Store geojson
                             });
                             $('#barangayFilter').html(options).prop('disabled', false);
                         } else {
@@ -333,7 +451,7 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 filterHouseTable();
             });
 
-            // Barangay filter (existing code)
+            // Barangay filter
             $('#barangayFilter').on('change', function() {
                 filterHouseTable();
             });
@@ -342,11 +460,14 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 var provinceId = $('#provinceFilter').val();
                 var municipalId = $('#municipalityFilter').val();
                 var barangayId = $('#barangayFilter').val();
+
                 $('table.table tbody tr').each(function() {
                     var row = $(this);
+                    // Get data directly from data attributes set in PHP
                     var rowProvince = row.data('province').toString();
                     var rowMunicipal = row.data('municipality').toString();
                     var rowBarangay = row.data('barangay').toString();
+
                     var show = true;
                     if (provinceId && rowProvince !== provinceId) show = false;
                     if (municipalId && rowMunicipal !== municipalId) show = false;
@@ -358,23 +479,31 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
             // Edit button click handler
             $('.edit-house-btn').on('click', function() {
                 var row = $(this).closest('tr');
-                $('#edit_id').val(row.data('id'));
-                $('#edit_house_number').val(row.data('house_number'));
-                $('#edit_building_type').val(row.data('building_type'));
-                $('#edit_status').val(row.data('status'));
-                $('#edit_no_floors').val(row.data('no_floors'));
-                $('#edit_year_built').val(row.data('year_built'));
-                $('#edit_street_name').val(row.data('street_name'));
-
+                var id = row.data('id');
+                var houseNumber = row.data('house_number');
+                var buildingType = row.data('building_type');
+                var status = row.data('status');
+                var noFloors = row.data('no_floors');
+                var yearBuilt = row.data('year_built');
+                var streetName = row.data('street_name');
                 var provinceId = row.data('province');
                 var municipalId = row.data('municipality');
                 var barangayId = row.data('barangay');
-                var houseGeojson = row.data('geojson'); // This will already be an object
-                $('#edit_geojson').val(JSON.stringify(houseGeojson)); // Convert back to string for textarea
+                var houseGeojson = row.data('geojson'); // This should already be an object if jQuery parses it
+
+                $('#edit_id').val(id);
+                $('#edit_house_number').val(houseNumber);
+                $('#edit_building_type').val(buildingType);
+                $('#edit_status').val(status);
+                $('#edit_no_floors').val(noFloors);
+                $('#edit_year_built').val(yearBuilt);
+                $('#edit_street_name').val(streetName);
+                // Set the geojson textarea with a stringified version (important for the change handler)
+                $('#edit_geojson').val(houseGeojson ? JSON.stringify(houseGeojson) : '');
 
                 $('#edit_province_id').val(provinceId);
 
-                // Load municipalities for the selected province
+                // Populate municipalities for the selected province
                 if (provinceId) {
                     $.get('/handler/barangayofficial/get_municipalities.php', {
                         province_id: provinceId
@@ -389,7 +518,8 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             options += '<option value="" disabled>No municipalities found</option>';
                             $('#edit_municipal_id').html(options).prop('disabled', false);
                         }
-                        // Load barangays for the selected municipality
+
+                        // Populate barangays after municipalities
                         if (municipalId) {
                             $.get('/handler/barangayofficial/get_barangays.php', {
                                 municipal_id: municipalId
@@ -399,35 +529,40 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 if (Array.isArray(data) && data.length > 0) {
                                     data.forEach(function(b) {
                                         options += '<option value="' + b.id + '"' + (b.id == barangayId ? ' selected' : '') + '>' + b.barangay_name + '</option>';
-                                        barangaysData[b.id] = b.geojson; // Store geojson
+                                        barangaysData[b.id] = b.geojson; // Store barangay geojson string
                                     });
                                     $('#edit_barangay_id').html(options).prop('disabled', false);
 
-                                    // IMPORTANT: Call initEditMap here after barangaysData is populated
-                                    // This ensures that when the modal opens, the map immediately zooms to the barangay.
+                                    // Initialize map here, after barangaysData is populated
                                     var selectedBarangayGeojson = barangaysData[barangayId] || null;
-                                    initEditMap(houseGeojson, selectedBarangayGeojson); // houseGeojson is already an object
+                                    // Pass houseGeojson as an object (jQuery data() might have already parsed it,
+                                    // but ensure it's an object before passing to initEditMap)
+                                    let houseGeojsonParsed = typeof houseGeojson === 'string' ? JSON.parse(houseGeojson) : houseGeojson;
+                                    initEditMap(houseGeojsonParsed, selectedBarangayGeojson);
 
                                 } else {
                                     options += '<option value="" disabled>No barangays found</option>';
                                     $('#edit_barangay_id').html(options).prop('disabled', false);
-                                    initEditMap(houseGeojson, null); // Only house geojson
+                                    let houseGeojsonParsed = typeof houseGeojson === 'string' ? JSON.parse(houseGeojson) : houseGeojson;
+                                    initEditMap(houseGeojsonParsed, null); // Only house geojson
                                 }
                             }, 'json');
                         } else {
                             $('#edit_barangay_id').html('<option value="">Select Barangay</option>').prop('disabled', true);
-                            initEditMap(houseGeojson, null); // Only house geojson
+                            let houseGeojsonParsed = typeof houseGeojson === 'string' ? JSON.parse(houseGeojson) : houseGeojson;
+                            initEditMap(houseGeojsonParsed, null); // Only house geojson
                         }
                     }, 'json');
                 } else {
                     $('#edit_municipal_id').html('<option value="">Select Municipality</option>').prop('disabled', true);
                     $('#edit_barangay_id').html('<option value="">Select Barangay</option>').prop('disabled', true);
-                    initEditMap(houseGeojson, null); // Only house geojson
+                    let houseGeojsonParsed = typeof houseGeojson === 'string' ? JSON.parse(houseGeojson) : houseGeojson;
+                    initEditMap(houseGeojsonParsed, null); // Only house geojson
                 }
+
                 $('#editHouseMsg').html('');
                 $('#editHouseModal').modal('show');
             });
-
 
             // Cascading dropdowns in modal (updated to trigger map view)
             $('#edit_province_id').on('change', function() {
@@ -435,9 +570,9 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $('#edit_municipal_id').prop('disabled', true).html('<option value="">Select Municipality</option>');
                 $('#edit_barangay_id').prop('disabled', true).html('<option value="">Select Barangay</option>');
                 barangaysData = {}; // Clear barangays data when province changes
-                // Pass the house geojson object directly
+                // Get house geojson from the textarea, parse it if it exists
                 var houseGeojson = $('#edit_geojson').val() ? JSON.parse($('#edit_geojson').val()) : null;
-                initEditMap(houseGeojson, null); // Reset map when province changes
+                initEditMap(houseGeojson, null); // Reset map with only house geojson
                 if (provinceId) {
                     $.get('/handler/barangayofficial/get_municipalities.php', {
                         province_id: provinceId
@@ -460,9 +595,9 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 var municipalId = $(this).val();
                 $('#edit_barangay_id').prop('disabled', true).html('<option value="">Select Barangay</option>');
                 barangaysData = {}; // Clear barangays data when municipality changes
-                // Pass the house geojson object directly
+                // Get house geojson from the textarea, parse it if it exists
                 var houseGeojson = $('#edit_geojson').val() ? JSON.parse($('#edit_geojson').val()) : null;
-                initEditMap(houseGeojson, null); // Reset map when municipality changes
+                initEditMap(houseGeojson, null); // Reset map with only house geojson
                 if (municipalId) {
                     $.get('/handler/barangayofficial/get_barangays.php', {
                         municipal_id: municipalId
@@ -482,17 +617,17 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 }
             });
 
-            // Handle change for Barangay dropdown in modal to pan/zoom map
+            // Handle change for Barangay dropdown in modal to pan/zoom map and draw boundary
             $('#edit_barangay_id').on('change', function() {
                 var barangayId = $(this).val();
                 // Ensure houseGeojson is an object if it exists in the textarea
                 var houseGeojson = $('#edit_geojson').val() ? JSON.parse($('#edit_geojson').val()) : null;
-                var selectedBarangayGeojson = barangaysData[barangayId] || null; // Get geojson from stored data
+                var selectedBarangayGeojson = barangaysData[barangayId] || null; // Get geojson string from stored data
                 initEditMap(houseGeojson, selectedBarangayGeojson);
             });
 
 
-            // AJAX form submit for editing house (existing code)
+            // AJAX form submit for editing house
             $('#editHouseForm').on('submit', function(e) {
                 e.preventDefault();
                 var formData = $(this).serialize();
@@ -501,28 +636,42 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     if (response.success) {
                         // Update the table row in-place
                         var id = $('#edit_id').val();
+                        var newHouseNumber = $('#edit_house_number').val();
+                        var newBuildingType = $('#edit_building_type').val();
+                        var newStatus = $('#edit_status').val();
+                        var newNoFloors = $('#edit_no_floors').val();
+                        var newYearBuilt = $('#edit_year_built').val();
+                        var newStreetName = $('#edit_street_name').val();
+                        var newProvinceId = $('#edit_province_id').val();
+                        var newMunicipalId = $('#edit_municipal_id').val();
+                        var newBarangayId = $('#edit_barangay_id').val();
+                        var newGeojson = $('#edit_geojson').val(); // This is the stringified version from textarea
+
                         var row = $('tr[data-id="' + id + '"]');
-                        row.find('td').eq(1).text($('#edit_house_number').val());
+                        row.find('td').eq(1).text(newHouseNumber);
+                        // Update the displayed names based on selected dropdown text
                         row.find('td').eq(2).text($('#edit_province_id option:selected').text());
                         row.find('td').eq(3).text($('#edit_municipal_id option:selected').text());
                         row.find('td').eq(4).text($('#edit_barangay_id option:selected').text());
-                        row.find('td').eq(5).text($('#edit_street_name').val());
-                        row.find('td').eq(6).text($('#edit_building_type').val());
-                        row.find('td').eq(7).text($('#edit_status').val());
-                        row.find('td').eq(8).text($('#edit_no_floors').val());
-                        row.find('td').eq(9).text($('#edit_year_built').val());
+                        row.find('td').eq(5).text(newStreetName);
+                        row.find('td').eq(6).text(newBuildingType);
+                        row.find('td').eq(7).text(newStatus);
+                        row.find('td').eq(8).text(newNoFloors);
+                        row.find('td').eq(9).text(newYearBuilt);
+
                         // Update data attributes (important for filtering and re-editing)
-                        row.data('house_number', $('#edit_house_number').val());
-                        row.data('building_type', $('#edit_building_type').val());
-                        row.data('status', $('#edit_status').val());
-                        row.data('no_floors', $('#edit_no_floors').val());
-                        row.data('year_built', $('#edit_year_built').val());
-                        row.data('street_name', $('#edit_street_name').val());
-                        row.data('province', $('#edit_province_id').val());
-                        row.data('municipality', $('#edit_municipal_id').val());
-                        row.data('barangay', $('#edit_barangay_id').val());
-                        // When updating data attribute, ensure it's a string, especially if it was an object
-                        row.data('geojson', $('#edit_geojson').val());
+                        row.data('house_number', newHouseNumber);
+                        row.data('building_type', newBuildingType);
+                        row.data('status', newStatus);
+                        row.data('no_floors', newNoFloors);
+                        row.data('year_built', newYearBuilt);
+                        row.data('street_name', newStreetName);
+                        row.data('province', newProvinceId);
+                        row.data('municipality', newMunicipalId);
+                        row.data('barangay', newBarangayId);
+                        // When updating data attribute, parse the string back to an object if it was stored as string
+                        row.data('geojson', newGeojson ? JSON.parse(newGeojson) : null);
+
                         $('#editHouseMsg').html('<span class="text-success">' + response.message + '</span>');
                         setTimeout(function() {
                             $('#editHouseModal').modal('hide');
@@ -535,9 +684,8 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 });
             });
 
-            // Initialize map when modal is shown (updated to include barangay GeoJSON logic)
-            // This handler is still crucial for map rendering once the modal animation finishes.
-            $('#editHouseModal').on('shown.bs.modal', function() {
+            // When modal is shown, ensure map invalidates size to render correctly
+            $('#editHouseModal').on('shown.bs.modal', function () {
                 // The initEditMap is already called by the .edit-house-btn click handler
                 // once the barangay dropdown is populated.
                 // We just need to invalidate size here to ensure map renders correctly.
@@ -546,20 +694,26 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 }, 100);
                 setTimeout(function() {
                     if (editMap) editMap.invalidateSize();
-                }, 500);
+                }, 500); // Small delay to ensure modal is fully rendered
             });
 
-            // Destroy map when modal is hidden (existing code)
-            $('#editHouseModal').on('hidden.bs.modal', function() {
+            // When modal is hidden, destroy map
+            $('#editHouseModal').on('hidden.bs.modal', function () {
                 if (editMap) {
                     editMap.remove();
                     editMap = null;
                 }
+                // Also clear the barangay boundary layer reference
+                barangayBoundaryLayer = null;
             });
 
-            // Handle manual GeoJSON input change (e.g., if user pastes JSON) (existing code, still useful)
+            // When geojson textarea changes (e.g. from JS or manual edit), re-render marker
             $('#edit_geojson').on('change', function() {
                 if (!editMap) return; // Map might not be initialized yet if modal is not shown
+
+                // Get current barangay GeoJSON from the stored data
+                var currentBarangayId = $('#edit_barangay_id').val();
+                var currentBarangayGeojson = barangaysData[currentBarangayId] || null;
 
                 editDrawnItems.clearLayers();
                 var geojsonStr = $(this).val();
@@ -571,95 +725,25 @@ $houses = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             var marker = L.geoJSON(geojson).getLayers()[0];
                             if (marker) {
                                 editDrawnItems.addLayer(marker);
-                                if (marker.getLatLng) {
+                                // Don't recenter if a barangay boundary is already displayed and the map is zoomed to it
+                                // Only recenter on marker if no valid boundary is drawn, or if marker is outside current view
+                                if ((!barangayBoundaryLayer || !barangayBoundaryLayer.getBounds().isValid()) && marker.getLatLng) {
                                     editMap.setView(marker.getLatLng(), 16);
+                                } else if (marker.getLatLng && !editMap.getBounds().contains(marker.getLatLng())) {
+                                    editMap.setView(marker.getLatLng(), editMap.getZoom()); // Just center, keep current zoom
                                 }
                             }
                         }
                     } catch (e) {
                         console.error('GeoJSON parse error in geojson change handler:', e, geojsonStr);
-                        $(this).val('');
+                        $(this).val(''); // Clear invalid JSON
                     }
                 }
+                // Always re-initialize map with current house and barangay GeoJSON
+                // This ensures the barangay boundary is still there even if marker is cleared/edited
+                initEditMap(geojsonStr ? JSON.parse(geojsonStr) : null, currentBarangayGeojson);
             });
         });
     </script>
-
-    <div class="modal fade" id="editHouseModal" tabindex="-1" role="dialog" aria-labelledby="editHouseModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <form id="editHouseForm" method="post" action="">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editHouseModalLabel">Edit House</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" id="edit_id" name="edit_id">
-                        <div class="form-group">
-                            <label>House Number</label>
-                            <input type="number" name="house_number" id="edit_house_number" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit_province_id">Province</label>
-                            <select class="form-control" id="edit_province_id" name="province_id" required>
-                                <option value="">Select Province</option>
-                                <?php foreach (
-                                    $provinces as $province): ?>
-                                    <option value="<?= $province['id'] ?>"><?= htmlspecialchars($province['province_name']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit_municipal_id">Municipality / City</label>
-                            <select class="form-control" id="edit_municipal_id" name="municipal_id" required>
-                                <option value="">Select Municipality / City</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit_barangay_id">Barangay</label>
-                            <select class="form-control" id="edit_barangay_id" name="barangay_id" required>
-                                <option value="">Select Barangay</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Building Type</label>
-                            <input type="text" name="building_type" id="edit_building_type" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>Status</label>
-                            <input type="text" name="status" id="edit_status" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>No. Floors</label>
-                            <input type="number" name="no_floors" id="edit_no_floors" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>Year Built</label>
-                            <input type="date" name="year_built" id="edit_year_built" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>Street Name</label>
-                            <input type="text" name="street_name" id="edit_street_name" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="edit_map">Select Location on Map</label>
-                            <div id="edit_map" style="height: 350px; width: 100%; margin-bottom: 10px;"></div>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit_geojson">GeoJSON</label>
-                            <textarea class="form-control" id="edit_geojson" name="geojson" rows="3" required></textarea>
-                        </div>
-                        <div id="editHouseMsg"></div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
 </body>
 </html>

@@ -331,11 +331,13 @@ $(document).ready(function() {
     $('#barangayFilter').on('change', function() {
         var barangayId = $(this).val();
         $('#familyNameFilter').prop('disabled', true).html('<option value="">Select Family Name</option>');
+        window.familyData = [];
         if (barangayId) {
             $.get('/handler/barangayofficial/get_family_names.php', { barangay_id: barangayId }, function(data) {
+                window.familyData = Array.isArray(data) ? data : [];
                 var options = '<option value="">Select Family Name</option>';
-                if (Array.isArray(data) && data.length > 0) {
-                    data.forEach(function(f) {
+                if (window.familyData.length > 0) {
+                    window.familyData.forEach(function(f) {
                         options += '<option value="' + (f.family_name ? f.family_name : '') + '">' + (f.family_name ? f.family_name : '(No Family Name)') + '</option>';
                     });
                     $('#familyNameFilter').html(options).prop('disabled', false);
