@@ -20,6 +20,7 @@ $superadmin = [
 ];
 
 $municipal_official = [
+    '/locator_slip.php',
     'municipalofficial/index.php',
     'municipalofficial/registration.php',
     'municipalofficial/manage-barangays.php',

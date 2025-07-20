@@ -111,6 +111,7 @@ include './configuration/config.php';
                             <strong>Province:</strong> <?= htmlspecialchars($item['province_name'] ?? '') ?><br>
                         <?php elseif ($type === 'locator_slip'): ?>
                             <strong>Slip Name:</strong> <?= htmlspecialchars($item['name'] ?? '') ?><br>
+                            <strong>Purpose:</strong> <?= htmlspecialchars($item['purpose'] ?? '') ?><br>
                         <?php else: ?>
                             <strong>House Number:</strong> <?= htmlspecialchars($item['house_number'] ?? '') ?><br>
                             <strong>Street Name:</strong> <?= htmlspecialchars($item['street_name'] ?? '') ?><br>
