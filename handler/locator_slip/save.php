@@ -19,13 +19,14 @@ try {
 }
 
 // Check POST parameters
-if (!isset($_POST['name']) || !isset($_POST['geojson'])) {
+if (!isset($_POST['name']) || !isset($_POST['geojson']) || !isset($_POST['purpose'])) {
     log_error('Missing parameters: ' . json_encode($_POST));
     echo json_encode(['success' => false, 'message' => 'Missing parameters.']);
     exit;
 }
 
 $name = trim($_POST['name']);
+$purpose = trim($_POST['purpose']);
 $geojson = $_POST['geojson'];
 
 if ($name === '' || $geojson === '') {
@@ -41,8 +42,8 @@ if (!isset($conn) || !$conn) {
 }
 
 try {
-    $stmt = $conn->prepare('INSERT INTO locator_slips (name, geojson) VALUES (?, ?)');
-    $stmt->execute([$name, $geojson]);
+    $stmt = $conn->prepare('INSERT INTO locator_slips (name, geojson,purpose) VALUES (?, ?,?)');
+    $stmt->execute([$name, $geojson,$purpose]);
     $id = $conn->lastInsertId();
     echo json_encode(['success' => true, 'id' => $id]);
 } catch (PDOException $e) {

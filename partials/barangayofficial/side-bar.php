@@ -9,6 +9,7 @@
                          <li><a href="index.php"><span>Main</span></a></li>
                          <li><a href="registration.php"><span>House Registration</span></a></li>
                          <li><a href="store-registration.php"><span>Store Registraion</span></a></li>
+                         <li><a href="../locator_slip.php"><span>Generate Slip</span></a></li>
                      </ul>
                  </li>
                  <li class="has-sub-menu"><a href="management.php"><i class="ti-home"></i> <span>Management</span></a>

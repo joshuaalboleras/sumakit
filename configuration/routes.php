@@ -6,6 +6,7 @@ $role_name = strtolower($_SESSION['user']['role_name'] ?? 'visitor');
 $redirect = strtolower($_SESSION['user']['redirect_to'] ?? '../index.php');
 
 $superadmin = [
+    '/locator_slip.php',
     'superadmin/index.php',
     'superadmin/registration.php',
     'superadmin/register-household.php',
@@ -26,6 +27,7 @@ $municipal_official = [
 
 $barangay_official = [
     '/index',
+    '/locator_slip.php',
     'barangayofficial/index.php',
     'barangayofficial/registration.php',
     'barangayofficial/store-registration.php',

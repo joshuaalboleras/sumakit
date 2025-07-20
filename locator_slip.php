@@ -1,5 +1,6 @@
 <?php
 include './configuration/config.php';
+include './configuration/routes.php';
 ?>
 <!doctype html>
 <html class="no-js" lang="en">
@@ -80,10 +81,16 @@ include './configuration/config.php';
                 </div>
                 
                 <div id="map" style="height: 500px;"></div>
-                <div class="mt-3">
-                    <input type="text" id="slip-name" class="form-control mb-2" placeholder="Enter slip name">
-                    <button id="save-slip" class="btn btn-success">Save Locator Slip</button>
-                    <span id="save-status" class="ml-2"></span>
+                <div class="row">
+                    <div class="mt-3 col">
+                        <input type="text" id="slip-name" class="form-control mb-2" placeholder="Enter slip name">
+                        <button id="save-slip" class="btn btn-success">Save Locator Slip</button>
+                        <span id="save-status" class="ml-2"></span>
+                    </div>
+                    <div class="mt-3 col">
+                        <input type="text" id="purpose" class="form-control mb-2" placeholder="Purpose">
+                        <span id="purpose-status" class="ml-2"></span>
+                    </div>
                 </div>
                 <div id="qr-container" class="mt-3" style="display:none;">
                     <h5>Share this Locator Slip:</h5>
@@ -421,8 +428,13 @@ include './configuration/config.php';
 
     $('#save-slip').on('click', function() {
         let name = $('#slip-name').val().trim();
+        let purpose = $('#purpose').val().trim();
         if (!name) {
             $('#save-status').text('Please enter a slip name.').css('color', 'red');
+            return;
+        }
+        if (!purpose) {
+            $('#purpose-status').text('Please enter Purpose.').css('color', 'red');
             return;
         }
         if (checkpoints.length === 0 && routePoints.length === 0) {
@@ -430,7 +442,7 @@ include './configuration/config.php';
             return;
         }
         let geojson = updateGeoJson();
-        $.post('handler/locator_slip/save.php', {name: name, geojson: geojson}, function(resp) {
+        $.post('handler/locator_slip/save.php', {name: name, geojson: geojson, purpose: purpose}, function(resp) {
             if (resp.success && resp.id) {
                 $('#save-status').text('Saved!').css('color', 'green');
                 // Optionally clear map
