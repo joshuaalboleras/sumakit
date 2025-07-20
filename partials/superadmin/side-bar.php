@@ -13,7 +13,7 @@
             <li class="has-sub-menu"><a href="#"><i class="ti-home"></i> <span>Mamangement</span></a>
             <ul class="side-header-sub-menu">
                        
-                    <li><a href="management.php"><span>Management</span></a></li>
+                    <li><a href="management.php"><span>Manage Locations</span></a></li>
                     <li><a href="manage-houses.php"><span>Manage Houses</span></a></li>
                     <li><a href="manage-households.php"><span>Manage Households</span></a></li>
                     <li><a href="manage-stores.php"><span>Manage Stores</span></a></li>
