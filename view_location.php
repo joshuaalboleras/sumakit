@@ -140,17 +140,57 @@ include './configuration/config.php';
                                     } else if ("<?= $type ?>" === 'locator_slip') {
                                         // Locator slip: FeatureCollection or LineString/Point
                                         if (geometry.type === 'FeatureCollection') {
-                                            layer = L.geoJSON(geometry).addTo(map);
-                                            map.fitBounds(layer.getBounds());
+                                            // Draw all non-point features (routes, etc.)
+                                            var layer = L.geoJSON(geometry, {
+                                                filter: function(feature) {
+                                                    return feature.geometry.type !== 'Point';
+                                                }
+                                            }).addTo(map);
+                                            if (layer.getBounds().isValid()) {
+                                                map.fitBounds(layer.getBounds());
+                                            }
+                                            // Add red markers for checkpoints only
+                                            geometry.features.forEach(function(feature) {
+                                                if (
+                                                    feature.geometry.type === 'Point' &&
+                                                    feature.properties &&
+                                                    feature.properties.type === 'checkpoint'
+                                                ) {
+                                                    var coords = feature.geometry.coordinates;
+                                                    L.marker([coords[1], coords[0]], {
+                                                        icon: L.icon({
+                                                            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+                                                            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                                                            iconSize: [25, 41],
+                                                            iconAnchor: [12, 41],
+                                                            popupAnchor: [1, -34],
+                                                            shadowSize: [41, 41]
+                                                        })
+                                                    }).addTo(map);
+                                                }
+                                            });
                                         } else if (geometry.type === 'LineString') {
-                                            layer = L.geoJSON({type: 'Feature', geometry: geometry}).addTo(map);
+                                            // Draw the route path
+                                            var layer = L.geoJSON({type: 'Feature', geometry: geometry}).addTo(map);
                                             map.fitBounds(layer.getBounds());
                                         } else if (geometry.type === 'Point') {
-                                            var coords = geometry.coordinates;
-                                            layer = L.marker([coords[1], coords[0]]).addTo(map);
-                                            map.setView([coords[1], coords[0]], 18);
+                                            // Only add marker if it's a checkpoint
+                                            if (geometry.properties && geometry.properties.type === 'checkpoint') {
+                                                var coords = geometry.coordinates;
+                                                L.marker([coords[1], coords[0]], {
+                                                    icon: L.icon({
+                                                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+                                                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                                                        iconSize: [25, 41],
+                                                        iconAnchor: [12, 41],
+                                                        popupAnchor: [1, -34],
+                                                        shadowSize: [41, 41]
+                                                    })
+                                                }).addTo(map);
+                                                map.setView([coords[1], coords[0]], 18);
+                                            }
                                         } else {
-                                            layer = L.geoJSON(geometry).addTo(map);
+                                            var layer = L.geoJSON(geometry).addTo(map);
                                             map.fitBounds(layer.getBounds());
                                         }
                                     } else if (geometry.type === 'Point') {
