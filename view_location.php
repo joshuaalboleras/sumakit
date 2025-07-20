@@ -48,33 +48,8 @@ include './configuration/config.php';
     <div class="main-wrapper">
 
 
-        <!-- Header Section Start -->
-        <div class="header-section">
-            <div class="container-fluid">
-                <div class="row justify-content-between align-items-center">
-
-                    <!-- Header Logo (Header Left) Start -->
-                    <div class="header-logo col-auto">
-                        <a href="index.html">
-                            <img src="./assets/images/logo/logo.png" alt="">
-                            <img src="./assets/images/logo/logo-light.png" class="logo-light" alt="">
-                        </a>
-                    </div><!-- Header Logo (Header Left) End -->
-
-                    <!-- Header Right Start -->
-                        <?php include './partials/shared/top-nav.php';?>
-                    <!-- Header Right End -->
-
-                </div>
-            </div>
-        </div><!-- Header Section End -->
-        <!-- Side Header Start -->
-        <div class="side-header show">
-            <button class="side-header-close"><i class="zmdi zmdi-close"></i></button>
-            <!-- Side Header Inner Start -->
-           
-            <!-- Side Header Inner End -->
-        </div><!-- Side Header End -->
+   
+      
 
         <!-- Content Body Start -->
         <div class="content-body">
@@ -82,7 +57,7 @@ include './configuration/config.php';
                 <?php
                 $item = null;
                 $geojson = null;
-                $type = isset($_GET['type']) && in_array($_GET['type'], ['store', 'municipality']) ? $_GET['type'] : 'house';
+                $type = isset($_GET['type']) && in_array($_GET['type'], ['store', 'municipality', 'locator_slip']) ? $_GET['type'] : 'house';
                 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
                     $id = intval($_GET['id']);
                     if ($type === 'store') {
@@ -94,6 +69,13 @@ include './configuration/config.php';
                         }
                     } else if ($type === 'municipality') {
                         $stmt = $conn->prepare("SELECT m.*, p.province_name FROM municipalities m JOIN provinces p ON m.province_id = p.id WHERE m.id = ?");
+                        $stmt->execute([$id]);
+                        $item = $stmt->fetch(PDO::FETCH_ASSOC);
+                        if ($item && !empty($item['geojson'])) {
+                            $geojson = $item['geojson'];
+                        }
+                    } else if ($type === 'locator_slip') {
+                        $stmt = $conn->prepare("SELECT * FROM locator_slips WHERE id = ?");
                         $stmt->execute([$id]);
                         $item = $stmt->fetch(PDO::FETCH_ASSOC);
                         if ($item && !empty($item['geojson'])) {
@@ -113,6 +95,7 @@ include './configuration/config.php';
                     <?php
                     if ($type === 'store') echo 'Store Location Viewer';
                     else if ($type === 'municipality') echo 'Municipality Location Viewer';
+                    else if ($type === 'locator_slip') echo 'Locator Slip Viewer';
                     else echo 'House Location Viewer';
                     ?>
                 </h3>
@@ -126,6 +109,8 @@ include './configuration/config.php';
                         <?php elseif ($type === 'municipality'): ?>
                             <strong>Municipality:</strong> <?= htmlspecialchars($item['municipality'] ?? '') ?><br>
                             <strong>Province:</strong> <?= htmlspecialchars($item['province_name'] ?? '') ?><br>
+                        <?php elseif ($type === 'locator_slip'): ?>
+                            <strong>Slip Name:</strong> <?= htmlspecialchars($item['name'] ?? '') ?><br>
                         <?php else: ?>
                             <strong>House Number:</strong> <?= htmlspecialchars($item['house_number'] ?? '') ?><br>
                             <strong>Street Name:</strong> <?= htmlspecialchars($item['street_name'] ?? '') ?><br>
@@ -152,6 +137,22 @@ include './configuration/config.php';
                                         // Municipality: render as boundary (Polygon/Multipolygon)
                                         layer = L.geoJSON(geometry).addTo(map);
                                         map.fitBounds(layer.getBounds());
+                                    } else if ("<?= $type ?>" === 'locator_slip') {
+                                        // Locator slip: FeatureCollection or LineString/Point
+                                        if (geometry.type === 'FeatureCollection') {
+                                            layer = L.geoJSON(geometry).addTo(map);
+                                            map.fitBounds(layer.getBounds());
+                                        } else if (geometry.type === 'LineString') {
+                                            layer = L.geoJSON({type: 'Feature', geometry: geometry}).addTo(map);
+                                            map.fitBounds(layer.getBounds());
+                                        } else if (geometry.type === 'Point') {
+                                            var coords = geometry.coordinates;
+                                            layer = L.marker([coords[1], coords[0]]).addTo(map);
+                                            map.setView([coords[1], coords[0]], 18);
+                                        } else {
+                                            layer = L.geoJSON(geometry).addTo(map);
+                                            map.fitBounds(layer.getBounds());
+                                        }
                                     } else if (geometry.type === 'Point') {
                                         var coords = geometry.coordinates;
                                         layer = L.marker([coords[1], coords[0]]).addTo(map);
@@ -169,7 +170,7 @@ include './configuration/config.php';
                         });
                     </script>
                 <?php else: ?>
-                    <div class="alert alert-danger"><?= $type === 'store' ? 'Store' : ($type === 'municipality' ? 'Municipality' : 'House') ?> not found or no location data available.</div>
+                    <div class="alert alert-danger"><?= $type === 'store' ? 'Store' : ($type === 'municipality' ? 'Municipality' : ($type === 'locator_slip' ? 'Locator Slip' : 'House')) ?> not found or no location data available.</div>
                 <?php endif; ?>
             </div>
         </div>
