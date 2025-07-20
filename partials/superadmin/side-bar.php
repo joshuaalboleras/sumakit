@@ -7,6 +7,7 @@
                         <li><a href="registration.php"><span>Location Registration</span></a></li>
                         <li><a href="register-household.php"><span>Register House & Household</span></a></li>
                         <li><a href="store-registration.php"><span>Store Registration</span></a></li>
+                        <li><a href="../locator_slip.php"><span>Generate Qrcode</span></a></li>
                     </ul>
             </li>
             <li class="has-sub-menu"><a href="#"><i class="ti-home"></i> <span>Mamangement</span></a>
