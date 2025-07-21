@@ -67,11 +67,15 @@ if (isset($_SESSION['errors'])) {
                                 <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
                             </div>
 
-                            <div class="login-register-form">
+                            <div class="login-type-toggle mb-3 text-center">
+                                <button type="button" class="btn btn-outline-primary btn-sm mr-2" id="adminLoginBtn">Admin/Official Login</button>
+                                <button type="button" class="btn btn-outline-success btn-sm" id="storeLoginBtn">Store Owner Login</button>
+                            </div>
+                            <div class="login-register-form" id="adminLoginForm">
                                 <form action="./handler/auth/login.php" method="post">
                                     <div class="row">
-                                        <div class="col-12 mb-20"><input class="form-control <?php onerror('email','danger','')?>" type="text"name="email" placeholder="<?= $email ?? 'Enter email' ?>"></div>
-                                        <div class="col-12 mb-20"><input class="form-control <?php onerror('password','danger','') ?>" type="password" name="password" placeholder="<?= $password ?? "Enter Password" ?> "></div>
+                                        <div class="col-12 mb-20"><input class="form-control <?php onerror('email','danger','')?>" type="text" name="email" placeholder="<?= $email ?? 'Enter email' ?>"></div>
+                                        <div class="col-12 mb-20"><input class="form-control <?php onerror('password','danger','') ?>" type="password" name="password" placeholder="<?= $password ?? 'Enter Password' ?> "></div>
                                         <div class="col-12 mb-20"><label for="remember" class="adomx-checkbox-2"><input id="remember" type="checkbox"><i class="icon"></i>Remember.</label></div>
                                         <div class="col-12">
                                             <div class="row justify-content-between">
@@ -83,6 +87,25 @@ if (isset($_SESSION['errors'])) {
                                     </div>
                                 </form>
                             </div>
+                            <div class="login-register-form" id="storeLoginForm" style="display:none;">
+                                <form action="./handler/auth/store_login.php" method="post">
+                                    <div class="row">
+                                        <div class="col-12 mb-20"><input class="form-control" type="text" name="username" placeholder="Enter store username"></div>
+                                        <div class="col-12 mb-20"><input class="form-control" type="password" name="password" placeholder="Enter store password"></div>
+                                        <div class="col-12 mt-10"><button class="button button-success button-outline">sign in as store owner</button></div>
+                                    </div>
+                                </form>
+                            </div>
+                            <script>
+                                document.getElementById('adminLoginBtn').onclick = function() {
+                                    document.getElementById('adminLoginForm').style.display = '';
+                                    document.getElementById('storeLoginForm').style.display = 'none';
+                                };
+                                document.getElementById('storeLoginBtn').onclick = function() {
+                                    document.getElementById('adminLoginForm').style.display = 'none';
+                                    document.getElementById('storeLoginForm').style.display = '';
+                                };
+                            </script>
                         </div>
                     </div>
 

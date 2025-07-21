@@ -43,6 +43,16 @@ $visitor = [
     'login.php'
 ];
 
+$store_owner = [
+    '/locator_slip.php',
+    'storeowner/index.php',
+    'storeowner/registration.php',
+    'storeowner/manage-stores.php',
+    'storeowner/inventory.php',
+    'storeowner/pos.php',
+    'storeowner/analytics.php',
+];
+
 if($role_name == 'super admin'){
     if(!in_array($page,$superadmin)){
         header("Location:../{$redirect}");
@@ -63,6 +73,12 @@ if($role_name == 'municipal official'){
 
 if($role_name == 'barangay official'){
     if(!in_array($page,$barangay_official)){
+         header("Location:../{$redirect}");
+    }
+}
+
+if($role_name == 'store owner'){
+    if(!in_array($page,$store_owner)){
          header("Location:../{$redirect}");
     }
 }

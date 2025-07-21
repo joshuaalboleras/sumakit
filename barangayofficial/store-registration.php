@@ -94,6 +94,15 @@ include '../configuration/routes.php';
                                         <input type="text" class="form-control" id="owner_name" name="owner_name" maxlength="250" required>
                                     </div>
                                     <div class="form-group">
+                                        <label for="username">Username</label>
+                                        <input type="text" class="form-control" id="username" name="username" maxlength="250" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="password">Password</label>
+                                        <input type="password" class="form-control" id="password" name="password" maxlength="250" required>
+                                        <small class="form-text text-muted">Password will be securely encrypted.</small>
+                                    </div>
+                                    <div class="form-group">
                                         <label for="province_id">Province</label>
                                         <select class="form-control" id="province_id" name="province_id" required>
                                             <option value="">Select Province</option>
