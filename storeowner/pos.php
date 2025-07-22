@@ -11,9 +11,9 @@ if (session_status() == PHP_SESSION_NONE) {
 // along with links to Bootstrap CSS, custom CSS, and potentially jQuery.
 include('includes/header.php');
 
-// Fetch all orders from the database
+// Fetch all orders from the database, ordered by id in descending order
 try {
-    $stmt = $conn->prepare("SELECT id, customer_name, total_items, total_amount, date_created, status FROM orders ORDER BY date_created DESC");
+    $stmt = $conn->prepare("SELECT id, customer_name, total_items, total_amount, date_created, status FROM orders ORDER BY id DESC");
     $stmt->execute();
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -119,14 +119,17 @@ include('includes/footer.php');
 
 <script>
     $(document).ready(function() {
-        // If you are using DataTables, ensure it's initialized here.
-        // Make sure you have included the DataTables JS and CSS files in your header/footer.
+        // Initialize DataTables for the ordersTable
         $('#ordersTable').DataTable({
-            // Optional DataTables configurations can go here, e.g.:
-            // "paging": true,
-            // "searching": true,
-            // "ordering": true,
-            // "info": true
+            // Order by the 'Order ID' column (index 0) in descending order by default
+            "order": [[ 0, "desc" ]],
+            "responsive": true, // Enable responsive features
+            "pageLength": 10,
+            "lengthMenu": [10, 25, 50, 100],
+            "language": {
+                "search": "_INPUT_",
+                "searchPlaceholder": "Search...",
+            }
         });
 
         // Custom AJAX script for handling status updates
@@ -139,6 +142,8 @@ include('includes/footer.php');
             const newStatus = $(this).data('new-status');
 
             // Confirm with the user before proceeding
+            // Using custom modals for confirmation/alerts is recommended instead of native alert/confirm
+            // For now, retaining alert/confirm as per your existing code for consistency.
             if (confirm(`Are you sure you want to change order ${orderId} to '${newStatus}'?`)) {
                 // Initiate the AJAX request
                 $.ajax({

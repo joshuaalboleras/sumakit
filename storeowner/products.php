@@ -197,7 +197,7 @@ try {
                             <input type="text" class="form-control" id="customerName" placeholder="Enter customer name" required>
                         </div>
                         <div class="d-grid gap-2">
-                            <button class="btn btn-success" id="completeOrder">Complete Order</button>
+                            <button class="btn btn-success" id="completeOrder">Add Order</button>
                         </div>
                     </div>
                 </div>
@@ -253,10 +253,10 @@ $(document).ready(function() {
             alert('Customer name is required.');
             return;
         }
-        if (confirm('Are you sure you want to complete this order for ' + customerName + '?')) {
+        if (confirm('Are you sure you want to add this order for ' + customerName + '?')) {
             $.post('products.php', { action: 'complete_order', customer_name: customerName }, function(response) {
                 if (response.status === 'success') {
-                    alert('Order #' + response.order_id + ' completed successfully!');
+                    alert('Order #' + response.order_id + ' added successfully!');
                     $('#customerName').val(''); // Clear name field
                     updateCartDisplay();
                 } else {
