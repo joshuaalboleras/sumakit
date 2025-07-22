@@ -1,1 +1,0 @@
-on @http://finals.test/barangayofficial/manage-houses.php the table with the column geojson, i want yuo to turn that into a button that links   to ../view_location.php and render the marker or the map boundary based of the geolocationtext, and please create the ../view_location since i have not implemented it yet

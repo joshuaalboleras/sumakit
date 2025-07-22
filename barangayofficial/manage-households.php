@@ -176,59 +176,65 @@ $households = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?= htmlspecialchars($row['relationship'] ?? '') ?></td>
                                     <td><?= $row['house_id'] ?> (<?= $row['house_number'] ?? '' ?>)</td>
                                     <td>
-                                        <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editModal<?= $row['id'] ?>">Edit</button>
+                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editModal<?= $row['id'] ?>">Edit</button>
                                         <form method="post" action="" style="display:inline;" onsubmit="return confirm('Delete this household member?');">
                                             <input type="hidden" name="delete_id" value="<?= $row['id'] ?>">
                                             <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                         </form>
                                     </td>
                                 </tr>
-                                <!-- Edit Modal -->
-                                <div class="modal fade" id="editModal<?= $row['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="editModalLabel<?= $row['id'] ?>" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <form method="post" action="">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="editModalLabel<?= $row['id'] ?>">Edit Household Member</h5>
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <input type="hidden" name="edit_id" value="<?= $row['id'] ?>">
-                                                    <div class="form-group">
-                                                        <label>Family Name</label>
-                                                        <input type="text" name="family_name" class="form-control" value="<?= htmlspecialchars($row['family_name'] ?? '') ?>" required>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Name</label>
-                                                        <input type="text" name="name" class="form-control" value="<?= htmlspecialchars($row['name'] ?? '') ?>" required>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Birthdate</label>
-                                                        <input type="date" name="birthdate" class="form-control" value="<?= htmlspecialchars($row['birthdate'] ?? '') ?>" required>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Occupation</label>
-                                                        <input type="text" name="occupation" class="form-control" value="<?= htmlspecialchars($row['occupation'] ?? '') ?>">
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Relationship</label>
-                                                        <input type="text" name="relationship" class="form-control" value="<?= htmlspecialchars($row['relationship'] ?? '') ?>">
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                    <button type="submit" class="btn btn-primary">Save changes</button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
                             <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
+                    <!-- Render all modals after the table -->
+                    <?php foreach($households as $row): ?>
+                    <div class="modal fade" id="editModal<?= $row['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="editModalLabel<?= $row['id'] ?>" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <form class="edit-household-form" data-id="<?= $row['id'] ?>">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editModalLabel<?= $row['id'] ?>">Edit Household Member</h5>
+                                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <input type="hidden" name="edit_id" value="<?= $row['id'] ?>">
+                                        <div class="form-group">
+                                            <label>Family Name</label>
+                                            <input type="text" name="family_name" class="form-control" value="<?= htmlspecialchars($row['family_name'] ?? '') ?>" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Name</label>
+                                            <input type="text" name="name" class="form-control" value="<?= htmlspecialchars($row['name'] ?? '') ?>" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Suffix</label>
+                                            <input type="text" name="suffix" class="form-control" value="<?= htmlspecialchars($row['suffix'] ?? '') ?>">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Birthdate</label>
+                                            <input type="date" name="birthdate" class="form-control" value="<?= htmlspecialchars($row['birthdate'] ?? '') ?>" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Occupation</label>
+                                            <input type="text" name="occupation" class="form-control" value="<?= htmlspecialchars($row['occupation'] ?? '') ?>">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Relationship</label>
+                                            <input type="text" name="relationship" class="form-control" value="<?= htmlspecialchars($row['relationship'] ?? '') ?>">
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div><!-- Content Body End -->
@@ -372,6 +378,37 @@ $(document).ready(function() {
             row.toggle(show);
         });
     }
+    // AJAX Edit Household Member
+    $('.edit-household-form').on('submit', function(e) {
+        e.preventDefault();
+        var form = $(this);
+        var modal = form.closest('.modal');
+        var id = form.data('id');
+        var row = $('tr').filter(function() { return $(this).find('td:first').text().trim() == id; });
+        $.ajax({
+            url: '/handler/barangayofficial/update_household_member.php',
+            type: 'POST',
+            data: form.serialize(),
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    // Update the table row with new values
+                    row.find('td').eq(1).text(form.find('[name="family_name"]').val());
+                    row.find('td').eq(2).text(form.find('[name="name"]').val());
+                    row.find('td').eq(3).text(form.find('[name="birthdate"]').val());
+                    row.find('td').eq(4).text(form.find('[name="occupation"]').val());
+                    row.find('td').eq(5).text(form.find('[name="relationship"]').val());
+                    // Optionally update data attributes if needed
+                    modal.modal('hide');
+                } else {
+                    alert(response.message || 'Update failed.');
+                }
+            },
+            error: function(xhr) {
+                alert('An error occurred while updating.');
+            }
+        });
+    });
 });
 </script>
 </body>

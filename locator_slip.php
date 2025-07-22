@@ -449,7 +449,7 @@ include './configuration/routes.php';
                 $('#clear-all').click();
                 $('#slip-name').val('');
                 // Generate QR code
-                let url = 'http://10.181.244.194/finals/view_location.php?type=locator_slip&id=' + resp.id;
+                let url = 'http://192.168.1.3/macaldos-kyuts/view_location.php?type=locator_slip&id=' + resp.id;
                 $('#qr-container').show();
                 $('#qrcode').empty();
                 let qr = new QRCode(document.getElementById("qrcode"), {

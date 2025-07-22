@@ -2,6 +2,7 @@
 include '../configuration/config.php';
 include '../configuration/routes.php';
 
+
 // Handle Province Delete
 if (isset($_POST['delete_province_id'])) {
     $id = intval($_POST['delete_province_id']);
@@ -113,38 +114,41 @@ $municipalities = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     </form>
                                 </td>
                             </tr>
-                            <!-- Edit Province Modal -->
-                            <div class="modal fade" id="editProvinceModal<?= $row['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="editProvinceModalLabel<?= $row['id'] ?>" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <form method="post" action="">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="editProvinceModalLabel<?= $row['id'] ?>">Edit Province</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <input type="hidden" name="edit_province_id" value="<?= $row['id'] ?>">
-                                                <div class="form-group">
-                                                    <label>Province Name</label>
-                                                    <input type="text" name="province_name" class="form-control" value="<?= htmlspecialchars($row['province_name'] ?? '') ?>" required>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                <button type="submit" class="btn btn-primary">Save changes</button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
                         <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+        <!-- Province Edit Modals -->
+        <?php foreach($provinces as $row): ?>
+        <div class="modal fade" id="editProvinceModal<?= $row['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="editProvinceModalLabel<?= $row['id'] ?>" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <form method="post" action="../handler/superadmin/edit_province.php">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editProvinceModalLabel<?= $row['id'] ?>">Edit Province</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="edit_province_id" value="<?= $row['id'] ?>">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+                            <div class="form-group">
+                                <label>Province Name</label>
+                                <input type="text" name="province_name" class="form-control" value="<?= htmlspecialchars($row['province_name'] ?? '') ?>" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <?php endforeach; ?>
         <!-- Municipality Table -->
         <div class="box mb-4">
             <div class="box-head">
@@ -178,38 +182,41 @@ $municipalities = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     </form>
                                 </td>
                             </tr>
-                            <!-- Edit Municipality Modal -->
-                            <div class="modal fade" id="editMunicipalityModal<?= $row['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="editMunicipalityModalLabel<?= $row['id'] ?>" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <form method="post" action="">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="editMunicipalityModalLabel<?= $row['id'] ?>">Edit Municipality</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <input type="hidden" name="edit_municipality_id" value="<?= $row['id'] ?>">
-                                                <div class="form-group">
-                                                    <label>Municipality</label>
-                                                    <input type="text" name="municipality" class="form-control" value="<?= htmlspecialchars($row['municipality'] ?? '') ?>" required>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                <button type="submit" class="btn btn-primary">Save changes</button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
                         <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+        <!-- Municipality Edit Modals -->
+        <?php foreach($municipalities as $row): ?>
+        <div class="modal fade" id="editMunicipalityModal<?= $row['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="editMunicipalityModalLabel<?= $row['id'] ?>" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <form method="post" action="../handler/superadmin/edit_municipality.php">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editMunicipalityModalLabel<?= $row['id'] ?>">Edit Municipality</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="edit_municipality_id" value="<?= $row['id'] ?>">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+                            <div class="form-group">
+                                <label>Municipality</label>
+                                <input type="text" name="municipality" class="form-control" value="<?= htmlspecialchars($row['municipality'] ?? '') ?>" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <?php endforeach; ?>
     </div>
     <div class="footer-section">
         <div class="container-fluid">
@@ -226,5 +233,13 @@ $municipalities = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
 <script src="../assets/js/plugins/tippy4.min.js.js"></script>
 <script src="../assets/js/main.js"></script>
+<script>
+// Fallback: Manually trigger modal on Edit button click
+$(document).on('click', 'button[data-toggle="modal"][data-target^="#editProvinceModal"], button[data-toggle="modal"][data-target^="#editMunicipalityModal"]', function(e) {
+    e.preventDefault();
+    var target = $(this).attr('data-target');
+    $(target).modal('show');
+});
+</script>
 </body>
 </html>

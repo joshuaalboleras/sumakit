@@ -5,4 +5,4 @@ if(!isset($_SESSION['csrf_token'])){
 }
 include 'functions.php';
 include 'db_config.php';
-
+// No closing PHP tag, no blank lines after this!

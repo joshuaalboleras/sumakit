@@ -3,7 +3,7 @@
 $host = 'localhost';
 $username ='root';
 $pass = '';
-$db = 'unknown';
+$db = 'finals';
 
 
 try{
